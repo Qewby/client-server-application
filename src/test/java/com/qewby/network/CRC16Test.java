@@ -6,6 +6,11 @@ import org.junit.Test;
 
 public class CRC16Test {
     @Test
+    public void testDefaultConstructor() {
+        new CRC16();
+    }
+
+    @Test
     public void testAbc() {
         short crc = CRC16.calculate("abc".getBytes());
         assertEquals((short) 0x9738, crc);
@@ -28,5 +33,4 @@ public class CRC16Test {
         short crc = CRC16.calculate("123".getBytes());
         assertEquals((short) 0xba04, crc);
     }
-
 }

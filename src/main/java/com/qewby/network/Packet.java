@@ -14,5 +14,5 @@ public class Packet {
     private int wLen;
     private short wCrc16;
     private Message bMsg;
-    private short WMsgCrc16;
+    private short wMsgCrc16;
 }
