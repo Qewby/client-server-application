@@ -6,7 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class Packet {
-    private byte bMagic = 0x13;
+    public static final byte MagicValue = 0x13;
+
+    private byte bMagic = MagicValue;
     private byte bSrc;
     private long bPktId;
     private int wLen;
