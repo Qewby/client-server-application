@@ -18,7 +18,7 @@ public class PacketReaderTest {
 
     @Before
     public void createPacketByteArray() {
-        validPacket = new byte[] {
+        validPacket = new byte[] { // valid not encrypted packet (so cannot be decrypted)
                 0x13,
                 0x01,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f,
@@ -95,8 +95,8 @@ public class PacketReaderTest {
         PacketReader.read(packet);
     }
 
-    @Test
-    public void testValidPacket() {
+    @Test(expected = UnknownError.class)
+    public void testNotEncryptedPacket() {
         byte[] packet = validPacket.clone();
         PacketReader.read(packet);
     }

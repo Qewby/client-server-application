@@ -3,6 +3,8 @@ package com.qewby.network;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import com.qewby.network.encryption.MessageDecryptor;
+
 public class PacketReader {
 
     public static Packet read(final byte[] packet) throws IllegalArgumentException {
@@ -36,6 +38,34 @@ public class PacketReader {
         }
 
         final Message bMsg = new Message(cType, bUserId, message);
+        Packet encryptedPacket = new Packet(bMagic, bSrc, bPktId, wLen, wCrc16, bMsg, wMsgCrc16);
+        return decryptPacket(encryptedPacket);
+    }
+
+    private static Packet decryptPacket(Packet packet) {
+        byte[] decryptedMessage = null;
+        int lengthDecrypted = 0;
+        try {
+            decryptedMessage = MessageDecryptor.decrypt(packet.getBMsg().getMessage());
+            lengthDecrypted = decryptedMessage.length + Integer.BYTES * 2;
+        } catch (Exception e) {
+            throw new UnknownError("Cannot decrypt message: " + e.getMessage());
+        }
+        final byte bMagic = packet.getBMagic();
+        final byte bSrc = packet.getBSrc();
+        final long bPktId = packet.getBPktId();
+        final int wLen = lengthDecrypted;
+        ByteBuffer header = ByteBuffer.allocate(14);
+        header.put(bMagic).put(bSrc).putLong(bPktId).putInt(wLen);
+        final short wCrc16 = CRC16.calculate(header.array());
+
+        final int cType = packet.getBMsg().getCType();
+        final int bUserId = packet.getBMsg().getBUserId();
+        ByteBuffer msg = ByteBuffer.allocate(lengthDecrypted);
+        msg.putInt(cType).putInt(bUserId).put(decryptedMessage);
+        final short wMsgCrc16 = CRC16.calculate(msg.array());
+
+        final Message bMsg = new Message(cType, bUserId, decryptedMessage);
         return new Packet(bMagic, bSrc, bPktId, wLen, wCrc16, bMsg, wMsgCrc16);
     }
 }
