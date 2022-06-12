@@ -18,7 +18,7 @@ public class PacketTest {
     private final int bUserId = 0x00000001;
     private final String message = "Hello world!";
     private final Message bMsg = new Message(cType, bUserId, message.getBytes());
-    private final short WMsgCrc16 = 0x7ff0;
+    private final short wMsgCrc16 = 0x7ff0;
 
     @Before
     public void testConstructor() {
@@ -29,7 +29,7 @@ public class PacketTest {
                 wLen,
                 wCrc16,
                 bMsg,
-                WMsgCrc16);
+                wMsgCrc16);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class PacketTest {
 
     @Test
     public void testWMsgCrc16() {
-        assertEquals(WMsgCrc16, p.getWMsgCrc16());
+        assertEquals(wMsgCrc16, p.getWMsgCrc16());
     }
 
     @Test
