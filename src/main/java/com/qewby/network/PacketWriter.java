@@ -29,7 +29,8 @@ public class PacketWriter {
         byte[] encryptedMessage = null;
         int lengthEncrypted = 0;
         try {
-            encryptedMessage = Encryptor.encrypt(packet.getBMsg().getMessage());
+            Encryptor encryptor = new Encryptor();
+            encryptedMessage = encryptor.encrypt(packet.getBMsg().getMessage());
             lengthEncrypted = encryptedMessage.length + Integer.BYTES * 2;
         } catch (Exception e) {
             throw new UnknownError("Cannot encrypt message: " + e.getMessage());

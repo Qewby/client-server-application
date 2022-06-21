@@ -1,33 +1,25 @@
 package com.qewby.network.encryption;
 
-import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 public class Encryptor {
-    private static Cipher cipher = null;
+    private Cipher cipher;
 
-    public static byte[] encrypt(byte[] message)
-            throws KeyStoreException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException,
-            InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        if (cipher == null) {
-            KeyManager manager = new KeyManager();
-            Key key = manager.getKey();
-            try {
-                cipher = Cipher.getInstance(KeyManager.getAlgorithm());
-                cipher.init(Cipher.ENCRYPT_MODE, key);
-            } catch (NoSuchPaddingException e) {
-
-            }
+    public Encryptor() throws UnknownError {
+        Key key = KeyManager.getKey();
+        try {
+            cipher = Cipher.getInstance(KeyManager.getAlgorithm());
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+        } catch (Exception e) {
+            throw new UnknownError(e.getMessage());
         }
+    }
+
+    synchronized public byte[] encrypt(byte[] message) throws BadPaddingException, IllegalBlockSizeException {
         byte[] encrypted = cipher.doFinal(message);
         return encrypted;
     }

@@ -40,7 +40,8 @@ public class PacketWriterTest {
         ByteBuffer buffer = ByteBuffer.wrap(result);
         int wLenOffset = 10;
         int actual = buffer.getInt(wLenOffset);
-        int expected = Encryptor.encrypt(message.getBytes()).length + Integer.BYTES * 2;
+        Encryptor encryptor = new Encryptor();
+        int expected = encryptor.encrypt(message.getBytes()).length + Integer.BYTES * 2;
         assertEquals(expected, actual);
     }
 
@@ -52,7 +53,8 @@ public class PacketWriterTest {
         int wLenOffset = 10;
         ByteBuffer buffer = ByteBuffer.wrap(result);
         int messageLength = buffer.getInt(wLenOffset) - Integer.BYTES * 2;
-        String expected = new String(Encryptor.encrypt(message.getBytes()));
+        Encryptor encryptor = new Encryptor();
+        String expected = new String(encryptor.encrypt(message.getBytes()));
         String actual = new String(Arrays.copyOfRange(result, messageOffset, messageOffset + messageLength));
         assertEquals(expected, actual);
     }

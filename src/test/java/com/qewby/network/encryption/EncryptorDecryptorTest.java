@@ -18,8 +18,10 @@ public class EncryptorDecryptorTest {
     @Test
     public void testEncryptedThenDecryptedTextEqualsOrigin() throws Exception {
         String origin = "{text: some JSON like data}";
-        byte[] encrypted = Encryptor.encrypt(origin.getBytes());
-        byte[] decrypted = Decryptor.decrypt(encrypted);
+        Encryptor encryptor = new Encryptor();
+        byte[] encrypted = encryptor.encrypt(origin.getBytes());
+        Decryptor decryptor = new Decryptor();
+        byte[] decrypted = decryptor.decrypt(encrypted);
         String result = new String(decrypted);
         assertEquals(origin, result);
     }

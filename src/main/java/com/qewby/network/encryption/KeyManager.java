@@ -5,7 +5,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
 import javax.crypto.KeyGenerator;
@@ -17,16 +16,20 @@ import java.io.IOException;
 
 public class KeyManager {
     private static KeyStore keyStore = null;
-    private static String messageKeyAlias = "messageKey";
-    private static String keyStoreFilePath = "data/keystore.ks";
-    private static String password = "";
-    private static String algorithm = "AES";
+    private static final String messageKeyAlias = "messageKey";
+    private static final String keyStoreFilePath = "data/keystore.ks";
+    private static final String password = "";
+    private static final String algorithm = "AES";
 
     public static String getAlgorithm() {
         return algorithm;
     }
 
-    KeyManager() throws KeyStoreException, NoSuchAlgorithmException, CertificateException {
+    private KeyManager() {
+    }
+
+    synchronized private static KeyStore getKeyStore()
+            throws KeyStoreException, NoSuchAlgorithmException, CertificateException {
         if (keyStore == null) {
             keyStore = KeyStore.getInstance("JCEKS");
             try (FileInputStream keyStoreData = new FileInputStream(keyStoreFilePath)) {
@@ -51,9 +54,15 @@ public class KeyManager {
                 // TODO: handle exception
             }
         }
+        return keyStore;
     }
 
-    public Key getKey() throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
-        return keyStore.getKey(messageKeyAlias, "".toCharArray());
+    synchronized public static Key getKey() throws UnknownError {
+        try {
+            KeyStore store = getKeyStore();
+            return store.getKey(messageKeyAlias, "".toCharArray());
+        } catch (Exception e) {
+            throw new UnknownError(e.getMessage());
+        }
     }
 }

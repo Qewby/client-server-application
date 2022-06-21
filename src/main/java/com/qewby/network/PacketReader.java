@@ -46,7 +46,8 @@ public class PacketReader {
         byte[] decryptedMessage = null;
         int lengthDecrypted = 0;
         try {
-            decryptedMessage = Decryptor.decrypt(packet.getBMsg().getMessage());
+            Decryptor decryptor = new Decryptor();
+            decryptedMessage = decryptor.decrypt(packet.getBMsg().getMessage());
             lengthDecrypted = decryptedMessage.length + Integer.BYTES * 2;
         } catch (Exception e) {
             throw new UnknownError("Cannot decrypt message: " + e.getMessage());
