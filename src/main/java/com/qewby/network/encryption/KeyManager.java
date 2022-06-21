@@ -17,7 +17,7 @@ import java.io.IOException;
 public class KeyManager {
     private static KeyStore keyStore = null;
     private static final String messageKeyAlias = "messageKey";
-    private static final String keyStoreFilePath = "data/keystore.ks";
+    private static final String keyStoreFilePath = "target/keystore.ks";
     private static final String password = "";
     private static final String algorithm = "AES";
 
