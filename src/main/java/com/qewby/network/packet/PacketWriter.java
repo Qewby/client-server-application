@@ -1,4 +1,4 @@
-package com.qewby.network;
+package com.qewby.network.packet;
 
 import java.nio.ByteBuffer;
 

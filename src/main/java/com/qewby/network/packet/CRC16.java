@@ -3,7 +3,7 @@
  * Uses irreducible polynomial:  1 + x^2 + x^15 + x^16
  *
  ******************************************************************************/
-package com.qewby.network;
+package com.qewby.network.packet;
 
 public class CRC16 {
 

@@ -1,4 +1,4 @@
-package com.qewby.network;
+package com.qewby.network.packet;
 
 import static org.junit.Assert.assertEquals;
 
