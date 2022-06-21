@@ -12,7 +12,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-public class MessageEncryptor {
+public class Encryptor {
     private static Cipher cipher = null;
 
     public static byte[] encrypt(byte[] message)

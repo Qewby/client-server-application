@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import com.qewby.network.encryption.MessageEncryptor;
+import com.qewby.network.encryption.Encryptor;
 
 public class PacketWriterTest {
     private final byte bMagic = 0x13;
@@ -40,7 +40,7 @@ public class PacketWriterTest {
         ByteBuffer buffer = ByteBuffer.wrap(result);
         int wLenOffset = 10;
         int actual = buffer.getInt(wLenOffset);
-        int expected = MessageEncryptor.encrypt(message.getBytes()).length + Integer.BYTES * 2;
+        int expected = Encryptor.encrypt(message.getBytes()).length + Integer.BYTES * 2;
         assertEquals(expected, actual);
     }
 
@@ -52,7 +52,7 @@ public class PacketWriterTest {
         int wLenOffset = 10;
         ByteBuffer buffer = ByteBuffer.wrap(result);
         int messageLength = buffer.getInt(wLenOffset) - Integer.BYTES * 2;
-        String expected = new String(MessageEncryptor.encrypt(message.getBytes()));
+        String expected = new String(Encryptor.encrypt(message.getBytes()));
         String actual = new String(Arrays.copyOfRange(result, messageOffset, messageOffset + messageLength));
         assertEquals(expected, actual);
     }

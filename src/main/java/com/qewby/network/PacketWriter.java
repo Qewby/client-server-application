@@ -2,7 +2,7 @@ package com.qewby.network;
 
 import java.nio.ByteBuffer;
 
-import com.qewby.network.encryption.MessageEncryptor;
+import com.qewby.network.encryption.Encryptor;
 
 public class PacketWriter {
 
@@ -29,7 +29,7 @@ public class PacketWriter {
         byte[] encryptedMessage = null;
         int lengthEncrypted = 0;
         try {
-            encryptedMessage = MessageEncryptor.encrypt(packet.getBMsg().getMessage());
+            encryptedMessage = Encryptor.encrypt(packet.getBMsg().getMessage());
             lengthEncrypted = encryptedMessage.length + Integer.BYTES * 2;
         } catch (Exception e) {
             throw new UnknownError("Cannot encrypt message: " + e.getMessage());

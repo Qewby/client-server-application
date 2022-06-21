@@ -4,22 +4,22 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-public class MessageEncryptorDecryptorTest {
+public class EncryptorDecryptorTest {
     @Test
     public void defaultDecryptorConstructor() {
-        new MessageDecryptor();
+        new Decryptor();
     }
 
     @Test
     public void defaultEncryptorConstructor() {
-        new MessageEncryptor();
+        new Encryptor();
     }
 
     @Test
     public void testEncryptedThenDecryptedTextEqualsOrigin() throws Exception {
         String origin = "{text: some JSON like data}";
-        byte[] encrypted = MessageEncryptor.encrypt(origin.getBytes());
-        byte[] decrypted = MessageDecryptor.decrypt(encrypted);
+        byte[] encrypted = Encryptor.encrypt(origin.getBytes());
+        byte[] decrypted = Decryptor.decrypt(encrypted);
         String result = new String(decrypted);
         assertEquals(origin, result);
     }

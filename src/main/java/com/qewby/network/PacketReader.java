@@ -3,7 +3,7 @@ package com.qewby.network;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import com.qewby.network.encryption.MessageDecryptor;
+import com.qewby.network.encryption.Decryptor;
 
 public class PacketReader {
 
@@ -46,7 +46,7 @@ public class PacketReader {
         byte[] decryptedMessage = null;
         int lengthDecrypted = 0;
         try {
-            decryptedMessage = MessageDecryptor.decrypt(packet.getBMsg().getMessage());
+            decryptedMessage = Decryptor.decrypt(packet.getBMsg().getMessage());
             lengthDecrypted = decryptedMessage.length + Integer.BYTES * 2;
         } catch (Exception e) {
             throw new UnknownError("Cannot decrypt message: " + e.getMessage());
