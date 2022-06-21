@@ -15,21 +15,13 @@ public class Worker extends Thread {
 		super.run();
 		for (int i = 0; i < 5; i++) {
 			synchronized (data) {
-				while (this.id != data.getState()) {
-					try {
-						data.wait();
-					} catch (InterruptedException e) {
-						return;
-					}
-				}
-				if (this.id == 1) {
+				if (data.getState() == 1) {
 					data.Tic();
-				} else if (this.id == 2) {
+				} else if (data.getState() == 2) {
 					data.Tak();
 				} else {
 					data.Toy();
 				}
-				data.notifyAll();
 			}
 		}
 	}

@@ -1,4 +1,3 @@
-
 public class Main {
     public static void main(String[] args) throws InterruptedException {
 
@@ -8,7 +7,9 @@ public class Main {
         Worker w2 = new Worker(2, d);
         Worker w3 = new Worker(3, d);
 
+        w1.join();
+        w2.join();
         w3.join();
-        System.out.println("end of mian...");
+        System.out.println("end of main...");
     }
 }
