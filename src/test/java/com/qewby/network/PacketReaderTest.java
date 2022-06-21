@@ -95,7 +95,7 @@ public class PacketReaderTest {
         PacketReader.read(packet);
     }
 
-    @Test(expected = UnknownError.class)
+    @Test
     public void testNotEncryptedPacket() {
         byte[] packet = validPacket.clone();
         PacketReader.read(packet);
