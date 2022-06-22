@@ -1,5 +1,6 @@
 package com.qewby.network.packet;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.nio.ByteBuffer;
@@ -88,5 +89,35 @@ public class PacketWriterTest {
         short invalidWMsgCrc16 = (short) (wCrc16 + 1);
         Packet packet = new Packet(bMagic, bSrc, bPktId, wLen, wCrc16, bMsg, invalidWMsgCrc16);
         PacketWriter.write(packet);
+    }
+
+    @Test
+    public void testBSrcInArrayEqualsToInitial() {
+        Packet packet = new Packet(bMagic, bSrc, bPktId, wLen, wCrc16, bMsg, wMsgCrc16);
+        byte[] result = PacketWriter.write(packet);
+        byte expected = bSrc;
+        byte actual = result[1];
+        assertEquals(expected, actual);
+    }
+    
+    @Test
+    public void testBPktIdInArrayEqualsToInitial() {
+        Packet packet = new Packet(bMagic, bSrc, bPktId, wLen, wCrc16, bMsg, wMsgCrc16);
+        byte[] result = PacketWriter.write(packet);
+        ByteBuffer bPktIdBuffer = ByteBuffer.allocate(Long.BYTES);
+        bPktIdBuffer.putLong(bPktId); 
+        byte[] expected = bPktIdBuffer.array();
+        byte[] actual = Arrays.copyOfRange(result, 2, 2 + Long.BYTES);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testWriteAndThenReadShoudBeEqual() {
+        Packet initial = new Packet(bMagic, bSrc, bPktId, wLen, wCrc16, bMsg, wMsgCrc16);
+        byte[] result = PacketWriter.write(initial);
+        Packet readed = PacketReader.read(result);
+        byte[] actual = readed.getBMsg().getMessage();
+        byte[] expected = initial.getBMsg().getMessage();
+        assertArrayEquals(expected, actual);
     }
 }
