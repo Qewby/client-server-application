@@ -1,12 +1,11 @@
 package com.qewby.network;
 
-/**
- * Hello world!
- *
- */
+import com.qewby.network.io.FakeReceiver;
+
 public class App {
     public static void main(String[] args) {
-        System.out.println(helloWorld());
+        Thread listener = new Thread(new FakeReceiver());
+        listener.start();
     }
 
     public static String helloWorld() {
