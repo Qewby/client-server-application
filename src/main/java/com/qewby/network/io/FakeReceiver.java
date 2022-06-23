@@ -2,8 +2,6 @@ package com.qewby.network.io;
 
 import java.util.Random;
 import java.util.Vector;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import com.qewby.network.encryption.Encryptor;
@@ -11,11 +9,11 @@ import com.qewby.network.packet.Message;
 import com.qewby.network.packet.Packet;
 import com.qewby.network.packet.PacketBuilder;
 import com.qewby.network.packet.PacketWriter;
+import com.qewby.network.processor.BytePacketHandler;
+import com.qewby.network.processor.ThreadPool;
 
-public class FakeReceiver implements Runnable, Receiver {
+public class FakeReceiver implements Receiver {
     private static Vector<byte[]> requests = new Vector<>(6);
-    private static Logger logger = Logger.getGlobal();
-    private static ExecutorService threadPool = Executors.newFixedThreadPool(4);
 
     static {
         Encryptor encryptor = new Encryptor();
@@ -32,30 +30,32 @@ public class FakeReceiver implements Runnable, Receiver {
             for (Message encryptedMessage : messages) {
                 Packet packet = PacketBuilder.build(encryptedMessage);
                 byte[] bytePacket = PacketWriter.write(packet);
-                //logger.info(new String(bytePacket));
+                // logger.info(new String(bytePacket));
                 requests.add(bytePacket);
             }
         } catch (Exception e) {
         }
     }
 
+    private static Logger logger = Logger.getGlobal();
+
     @Override
     public void receiveMessage() {
-        for (int i = 0; i < 50; ++i) {
+        for (int i = 0; i < 10; ++i) {
             Random random = new Random();
             byte[] request = requests.get(random.nextInt(requests.size()));
-            String requestString = new String(request);
-            logger.info("Received packet: " + requestString);
+            logger.info("Received packet: " + new String(request));
 
-            threadPool.submit(new BytePacketTask(request));
+            ThreadPool.submitTask(new BytePacketHandler(request));
 
-            /* try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                logger.warning(e.getMessage());
-            } */
+            /*
+             * try {
+             * Thread.sleep(100);
+             * } catch (InterruptedException e) {
+             * logger.warning(e.getMessage());
+             * }
+             */
         }
-        threadPool.shutdown();
     }
 
     @Override
