@@ -8,8 +8,8 @@ import com.qewby.network.io.TCPSender;
 public class StoreClientTCP {
     public static void main(String[] args) {
         try {
-            Sender sender = new TCPSender();
-            sender.sendMessage("hello".getBytes(), InetAddress.getByName("localhost"));
+            Sender sender = new TCPSender(InetAddress.getByName("localhost"));
+            sender.sendMessage("hello".getBytes());
         } catch (Exception e) {
         }
     }

@@ -38,8 +38,8 @@ public class EncryptedResponseBuilder implements ResponseBuilder {
             Packet responsePacket = PacketBuilder.build(encryptedResponse);
             byte[] responseBytePacket = PacketWriter.write(responsePacket);
 
-            Sender sender = new FakeSender(responseBytePacket);
-            sender.run();
+            Sender sender = new FakeSender();
+            sender.sendMessage(responseBytePacket);
             
         } catch (Exception e) {
             logger.severe(e.getMessage());

@@ -13,6 +13,11 @@ public class TCPSender implements Sender {
     private Socket clientSocket;
     private OutputStream out;
     private InputStream in;
+    InetAddress target;
+
+    public TCPSender(InetAddress target) {
+        this.target = target;
+    }
 
     public void startConnection(InetAddress target, int port) throws IOException {
         clientSocket = new Socket(target, port);
@@ -27,12 +32,7 @@ public class TCPSender implements Sender {
     }
 
     @Override
-    public void run() {
-
-    }
-
-    @Override
-    public void sendMessage(byte[] packet, InetAddress target) {
+    public void sendMessage(byte[] packet) {
         try {
             byte[] buffer = new byte[8096];
 
