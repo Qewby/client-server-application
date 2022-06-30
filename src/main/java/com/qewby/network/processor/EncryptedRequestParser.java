@@ -7,17 +7,12 @@ import com.qewby.network.packet.Message;
 import com.qewby.network.packet.Packet;
 import com.qewby.network.packet.PacketReader;
 
-public class BytePacketHandler implements Runnable {
-    private static Logger logger = Logger.getGlobal();
+public class EncryptedRequestParser implements RequestParser {
 
-    private byte[] requestBytePacket;
-
-    public BytePacketHandler(byte[] request) {
-        requestBytePacket = request;
+    public EncryptedRequestParser() {
     }
 
-    private Message getRequestMessage() {
-
+    public Message getRequestMessage(final byte[] requestBytePacket) {
         try {
             Packet requestPacket = PacketReader.read(requestBytePacket);
             int cType = requestPacket.getBMsg().getCType();
@@ -27,20 +22,12 @@ public class BytePacketHandler implements Runnable {
             Decryptor decryptor = new Decryptor();
             byte[] decryptedMessage = decryptor.decrypt(encryptedMessage);
             Message request = new Message(cType, bUserId, decryptedMessage);
-            logger.info("Decrypted message: " + new String(request.getMessage()));
+            Logger.getGlobal().info("Decrypted message: " + new String(request.getMessage()));
 
             return request;
         } catch (Exception e) {
-            logger.severe(e.getMessage());
+            Logger.getGlobal().severe(e.getMessage());
             return null;
         }
-    }
-
-    @Override
-    public void run() {
-        Message request = getRequestMessage();
-
-        Processor processor = new OkProcessor(request);
-        processor.run();
     }
 }
