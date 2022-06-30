@@ -5,11 +5,21 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
 
-import com.qewby.network.GlobalLogger;
+import com.qewby.network.packet.Message;
+import com.qewby.network.processor.EncryptedParser;
+import com.qewby.network.processor.EncryptedResponseBuilder;
+import com.qewby.network.processor.OkProcessor;
+import com.qewby.network.processor.PacketParser;
+import com.qewby.network.processor.Processor;
+import com.qewby.network.processor.ResponseBuilder;
 
 public class TCPReceiver implements Receiver {
-    private static int bufferSize = 8096;
+    private static final int bufferSize = 8096;
+    private static final PacketParser parser = new EncryptedParser();
+    private static final Processor processor = new OkProcessor();
+    private static final ResponseBuilder builder = new EncryptedResponseBuilder();
 
     private Socket clientSocket;
 
@@ -25,6 +35,7 @@ public class TCPReceiver implements Receiver {
     @Override
     public void receiveMessage() {
         try (OutputStream out = clientSocket.getOutputStream()) {
+            Sender sender = new StreamSender(out);
             try (DataInputStream in = new DataInputStream(clientSocket.getInputStream())) {
                 ByteBuffer packet = ByteBuffer.allocate(bufferSize);
                 packet.put(in.readByte()); // bMagic
@@ -32,16 +43,20 @@ public class TCPReceiver implements Receiver {
                 packet.putLong(in.readLong()); // bPktId
                 int expectedLength = in.readInt();
                 packet.putInt(expectedLength);
+                expectedLength += Short.BYTES * 2;
 
                 byte[] buffer = new byte[expectedLength];
                 in.readFully(buffer);
                 packet.put(buffer);
 
-                out.write("Hello world".getBytes());
-                out.flush();
+                Message request = parser.getRequestMessage(packet.array());
+                Message response = processor.process(request);
+                byte[] responsePacket = builder.build(response);
+
+                sender.sendMessage(responsePacket);
             }
         } catch (IOException e) {
-            GlobalLogger.severe(e.getMessage());
+            Logger.getGlobal().severe(e.getMessage());
         }
     }
 }

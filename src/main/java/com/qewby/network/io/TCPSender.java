@@ -5,8 +5,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.logging.Logger;
 
-import com.qewby.network.GlobalLogger;
+import com.qewby.network.packet.Message;
+import com.qewby.network.packet.PacketReader;
+import com.qewby.network.processor.EncryptedParser;
+import com.qewby.network.processor.PacketParser;
+
+import lombok.extern.java.Log;
 
 public class TCPSender implements Sender {
 
@@ -37,23 +44,27 @@ public class TCPSender implements Sender {
             byte[] buffer = new byte[8096];
 
             startConnection(target, 1337);
-            for (int i = 0; i < 13; ++i) {
-                out.write(0);
-            }
-            out.write(packet.length + 4);
-            GlobalLogger.info(String.valueOf(packet.length + 4));
-            out.write(0);
-            out.write(0);
+            /*
+             * try {
+             * Thread.sleep(5000);
+             * } catch (InterruptedException e) {
+             * Logger.getGlobal().warning(e.getMessage());
+             * }
+             */
+
             out.write(packet);
-            out.write(0);
-            out.write(0);
-            GlobalLogger.info("request sended");
+            Logger.getGlobal().info("Sended request: " + new String(packet));
             if (in.read(buffer) != -1) {
-                GlobalLogger.info("response readed: " + new String(buffer));
+                PacketParser parser = new EncryptedParser();
+                Message response = parser.getRequestMessage(buffer);
+                Logger.getGlobal().info("Response readed: " + new String(buffer));
+                Logger.getGlobal().info("Message: " + new String(response.getMessage()));
+            } else {
+                Logger.getGlobal().info("Server error");
             }
             stopConnection();
         } catch (IOException e) {
-            GlobalLogger.severe(e.getMessage());
+            Logger.getGlobal().severe(e.getMessage());
         }
     }
 }

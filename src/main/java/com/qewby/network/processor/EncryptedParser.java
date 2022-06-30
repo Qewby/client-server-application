@@ -7,9 +7,9 @@ import com.qewby.network.packet.Message;
 import com.qewby.network.packet.Packet;
 import com.qewby.network.packet.PacketReader;
 
-public class EncryptedRequestParser implements RequestParser {
+public class EncryptedParser implements PacketParser {
 
-    public EncryptedRequestParser() {
+    public EncryptedParser() {
     }
 
     public Message getRequestMessage(final byte[] requestBytePacket) {

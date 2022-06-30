@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ThreadPool {
 
-    private static ScheduledExecutorService threadPool = Executors.newScheduledThreadPool(8);
+    private static ScheduledExecutorService threadPool = Executors.newScheduledThreadPool(1);
 
     public static void stopThreadPool() {
         threadPool.shutdown();

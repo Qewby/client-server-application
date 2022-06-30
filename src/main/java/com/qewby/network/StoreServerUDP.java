@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import com.qewby.network.io.UDPSender;
@@ -33,7 +32,6 @@ public class StoreServerUDP implements Runnable {
                 Logger.getGlobal().info(new String(packet.getData(), packet.getOffset(), packet.getLength()));
 
                 UDPSender sender = new UDPSender(socket, packet);
-                //sender.sendMessage(Arrays.copyOfRange(buf, packet.getOffset(), packet.getOffset() + packet.getLength()));
                 sender.sendMessage("packet".getBytes());
             } catch (IOException e) {
                 Logger.getGlobal().warning(e.getMessage());

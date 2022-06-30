@@ -2,13 +2,13 @@ package com.qewby.network;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.qewby.network.io.TCPReceiver;
 import com.qewby.network.processor.ThreadPool;
 
 public class StoreServerTCP {
-    private static Logger logger = Logger.getGlobal();
 
     private ServerSocket serverSocket;
     private boolean runned;
@@ -17,8 +17,8 @@ public class StoreServerTCP {
         runned = true;
         serverSocket = new ServerSocket(port);
         while (runned) {
-            ThreadPool.submitTask(new TCPReceiver(serverSocket.accept()));
-            logger.info("Accepted new user");
+            ThreadPool.submitTask(new TCPReceiver(serverSocket.accept()), 10, TimeUnit.SECONDS);
+            Logger.getGlobal().info("Accepted new user");
         }
     }
 
@@ -32,7 +32,7 @@ public class StoreServerTCP {
         try {
             server.start(1337);
         } catch (IOException e) {
-            logger.severe(e.getMessage());
+            Logger.getGlobal().severe(e.getMessage());
         }
     }
 }
