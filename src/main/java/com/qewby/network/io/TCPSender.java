@@ -13,6 +13,8 @@ import com.qewby.network.processor.PacketParser;
 
 public class TCPSender implements Sender {
 
+    private static String ERROR_MESSAGE = "Server error";
+
     private Socket clientSocket;
     private OutputStream out;
     private InputStream in;
@@ -34,8 +36,7 @@ public class TCPSender implements Sender {
         clientSocket.close();
     }
 
-    @Override
-    public void sendMessage(byte[] packet) {
+    public String sendRequest(byte[] request) {
         try {
             byte[] buffer = new byte[8096];
 
@@ -48,19 +49,28 @@ public class TCPSender implements Sender {
              * }
              */
 
-            out.write(packet);
-            Logger.getGlobal().info("Sended request: " + new String(packet));
+            out.write(request);
+            Logger.getGlobal().info("Sended request: " + new String(request));
+            Message response = null;
             if (in.read(buffer) != -1) {
                 PacketParser parser = new EncryptedParser();
-                Message response = parser.getRequestMessage(buffer);
+                response = parser.getRequestMessage(buffer);
                 Logger.getGlobal().info("Response readed: " + new String(buffer));
                 Logger.getGlobal().info("Message: " + new String(response.getMessage()));
             } else {
-                Logger.getGlobal().info("Server error");
+                Logger.getGlobal().info(ERROR_MESSAGE);
+                return ERROR_MESSAGE;
             }
             stopConnection();
+            return new String(response.getMessage());
         } catch (IOException e) {
             Logger.getGlobal().severe(e.getMessage());
+            return e.getMessage();
         }
+    }
+
+    @Override
+    public void sendMessage(byte[] packet) {
+        sendRequest(packet);
     }
 }

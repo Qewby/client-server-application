@@ -49,8 +49,13 @@ public class TCPReceiver implements Receiver {
                 in.readFully(buffer);
                 packet.put(buffer);
 
-                Message request = parser.getRequestMessage(packet.array());
-                Message response = processor.process(request);
+                Message response = null;
+                try {
+                    Message request = parser.getRequestMessage(packet.array());
+                    response = processor.process(request);
+                } catch (Exception e) {
+                    response = new Message(0, 0, "Invalid packet".getBytes());
+                }
                 byte[] responsePacket = builder.build(response);
 
                 sender.sendMessage(responsePacket);
