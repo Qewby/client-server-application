@@ -36,20 +36,35 @@ public class StoreClientUDP {
         return Arrays.copyOfRange(buf, response.getOffset(), response.getOffset() + response.getLength());
     }
 
-    public static void main(String[] args) {
+    public String send() {
         boolean received = false;
-        while (!received) {
+        String responseString = null;
+        int i = 0;
+        while (!received && i < 5) {
+            i++;
             try {
-                StoreClientUDP client = new StoreClientUDP();
-                byte[] buffer = client.sendRequest(RequestPacketRandomizer.getPacket());
+                byte[] buffer = sendRequest(RequestPacketRandomizer.getPacket());
                 PacketParser parser = new EncryptedParser();
                 Message response = parser.getRequestMessage(buffer);
                 Logger.getGlobal().info("Response readed: " + new String(buffer));
-                Logger.getGlobal().info("Message: " + new String(response.getMessage()));
+                responseString = new String(response.getMessage());
+                Logger.getGlobal().info("Message: " + responseString);
                 received = true;
             } catch (Exception e) {
                 Logger.getGlobal().severe(e.getMessage());
+                responseString = e.getMessage();
             }
+        }
+        return responseString;
+    }
+
+    public static void main(String[] args) {
+        StoreClientUDP client;
+        try {
+            client = new StoreClientUDP();
+            client.send();
+        } catch (SocketException e) {
+            e.printStackTrace();
         }
     }
 }

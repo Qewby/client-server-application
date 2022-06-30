@@ -1,7 +1,6 @@
 package com.qewby.network;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -11,7 +10,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.qewby.network.io.Sender;
 import com.qewby.network.io.TCPSender;
 import com.qewby.network.packet.RequestPacketRandomizer;
 

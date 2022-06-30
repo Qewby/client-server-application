@@ -24,6 +24,11 @@ public class StoreServerUDP implements Runnable {
         socket = new DatagramSocket(port);
     }
 
+    public void stop() {
+        running = false;
+        socket.close();
+    }
+
     public void run() {
         running = true;
 
@@ -40,7 +45,6 @@ public class StoreServerUDP implements Runnable {
                 Logger.getGlobal().warning(e.getMessage());
             }
         }
-        socket.close();
     }
 
     public static void main(String[] args) {
