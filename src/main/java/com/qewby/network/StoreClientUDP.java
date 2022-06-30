@@ -9,6 +9,10 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import com.qewby.network.io.UDPSender;
+import com.qewby.network.packet.Message;
+import com.qewby.network.packet.RequestPacketRandomizer;
+import com.qewby.network.processor.EncryptedParser;
+import com.qewby.network.processor.PacketParser;
 
 public class StoreClientUDP {
     private static final int bufferSize = 8096;
@@ -26,18 +30,26 @@ public class StoreClientUDP {
         sender.sendMessage(request);
 
         DatagramPacket response = new DatagramPacket(buf, buf.length);
+        socket.setSoTimeout(5000);
         socket.receive(response);
 
         return Arrays.copyOfRange(buf, response.getOffset(), response.getOffset() + response.getLength());
     }
 
     public static void main(String[] args) {
-        try {
-            StoreClientUDP client = new StoreClientUDP();
-            byte[] response = client.sendRequest("Hello".getBytes());
-            Logger.getGlobal().info(new String(response));
-        } catch (Exception e) {
-            Logger.getGlobal().severe(e.getMessage());
+        boolean received = false;
+        while (!received) {
+            try {
+                StoreClientUDP client = new StoreClientUDP();
+                byte[] buffer = client.sendRequest(RequestPacketRandomizer.getPacket());
+                PacketParser parser = new EncryptedParser();
+                Message response = parser.getRequestMessage(buffer);
+                Logger.getGlobal().info("Response readed: " + new String(buffer));
+                Logger.getGlobal().info("Message: " + new String(response.getMessage()));
+                received = true;
+            } catch (Exception e) {
+                Logger.getGlobal().severe(e.getMessage());
+            }
         }
     }
 }

@@ -5,15 +5,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import com.qewby.network.packet.Message;
-import com.qewby.network.packet.PacketReader;
 import com.qewby.network.processor.EncryptedParser;
 import com.qewby.network.processor.PacketParser;
-
-import lombok.extern.java.Log;
 
 public class TCPSender implements Sender {
 

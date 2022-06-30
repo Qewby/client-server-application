@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import com.qewby.network.io.UDPSender;
+import com.qewby.network.processor.ThreadPool;
+import com.qewby.network.task.UDPPacketTask;
 
 public class StoreServerUDP implements Runnable {
     public static final int port = 1337;
@@ -29,10 +32,10 @@ public class StoreServerUDP implements Runnable {
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 socket.receive(packet);
 
-                Logger.getGlobal().info(new String(packet.getData(), packet.getOffset(), packet.getLength()));
+                byte[] request = Arrays.copyOfRange(packet.getData(), packet.getOffset(),
+                        packet.getOffset() + packet.getLength());
+                ThreadPool.submitTask(new UDPPacketTask(socket, packet, request), 10, TimeUnit.SECONDS);
 
-                UDPSender sender = new UDPSender(socket, packet);
-                sender.sendMessage("packet".getBytes());
             } catch (IOException e) {
                 Logger.getGlobal().warning(e.getMessage());
             }
