@@ -1,22 +1,23 @@
 package com.qewby.network.dao;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 import com.qewby.network.dto.ProductDto;
 
 public interface ProductDao {
-    List<ProductDto> getAllProducts();
-    
-    List<ProductDto> getProductsByCategoryId(final int categoryId);
+    List<ProductDto> getAllProducts() throws SQLException;
 
-    Optional<ProductDto> getProductById(final int id);
+    List<ProductDto> getProductsByCategoryId(final int categoryId) throws SQLException;
 
-    Optional<ProductDto> getProductByName(final String name);
+    Optional<ProductDto> getProductById(final int id) throws SQLException;
 
-    int insertNewProduct(final ProductDto productDto);
+    Optional<ProductDto> getProductByName(final String name) throws SQLException;
 
-    int updateProductInfo(final ProductDto productDto);
+    int insertNewProduct(final ProductDto productDto) throws SQLException;
 
-    int deleteProductById(final int id);
+    int updateProductInfoById(final ProductDto productDto) throws SQLException;
+
+    int deleteProductById(final int id) throws SQLException;
 }
