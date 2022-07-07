@@ -1,6 +1,7 @@
 package com.qewby.network;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
 import java.io.File;
@@ -109,6 +110,18 @@ public class GroupDaoTest {
     public void throwIfInsertNameAlreadyExists() throws SQLException {
         List<GroupDto> all = groupDao.getAllGroups();
         groupDao.insertNewGroup(all.get(0));
+    }
+
+    @Test
+    public void noValueIfIdNotExists() throws SQLException {
+        boolean condition = groupDao.getGroupById(1000).isPresent();
+        assertFalse(condition);
+    }
+
+    @Test
+    public void noValueIfNameNotExists() throws SQLException {
+        boolean condition = groupDao.getGroupByName("HLSDFJLS").isPresent();
+        assertFalse(condition);
     }
 
     @After

@@ -9,7 +9,7 @@ import com.qewby.network.dto.ProductDto;
 public interface ProductDao {
     List<ProductDto> getAllProducts() throws SQLException;
 
-    List<ProductDto> getProductsByCategoryId(final int categoryId) throws SQLException;
+    List<ProductDto> getProductsByGroupId(final int groupId) throws SQLException;
 
     Optional<ProductDto> getProductById(final int id) throws SQLException;
 
