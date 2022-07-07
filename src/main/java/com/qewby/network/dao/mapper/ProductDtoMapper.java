@@ -3,6 +3,7 @@ package com.qewby.network.dao.mapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.qewby.network.dao.RowMapper;
 import com.qewby.network.dto.ProductDto;
 
 public class ProductDtoMapper implements RowMapper<ProductDto> {

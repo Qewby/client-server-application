@@ -11,9 +11,11 @@ public interface GroupDao {
 
     Optional<GroupDto> getGroupById(final int id) throws SQLException;
 
-    int insertNewGroup(GroupDto groupDto) throws SQLException;
+    Optional<GroupDto> getGroupByName(final String name) throws SQLException;
 
-    int updateGroupInfo(GroupDto groupDto) throws SQLException;
+    int insertNewGroup(final GroupDto groupDto) throws SQLException;
+
+    int updateGroupInfo(final GroupDto groupDto) throws SQLException;
 
     int deleteGroupById(final int id) throws SQLException;
 }

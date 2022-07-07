@@ -82,6 +82,15 @@ public class GroupDaoTest {
     }
 
     @Test
+    public void groupReturnedByNameMustBeSimilarToGroupFromListWithSameName() throws SQLException {
+        List<GroupDto> allGroups = groupDao.getAllGroups();
+        assertEquals(2, allGroups.size());
+        GroupDto expected = allGroups.get(1);
+        GroupDto actual = groupDao.getGroupByName(expected.getName()).orElseThrow();
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void mustReturnZeroIfUpdateIdNotExists() throws SQLException {
         GroupDto groupDto = new GroupDto();
         groupDto.setId(1000);
@@ -89,11 +98,17 @@ public class GroupDaoTest {
         int rowCount = groupDao.updateGroupInfo(groupDto);
         assertEquals(0, rowCount);
     }
-    
+
     @Test
     public void mustReturnZeroIfDeleteIdNotExists() throws SQLException {
         int rowCount = groupDao.deleteGroupById(1000);
         assertEquals(0, rowCount);
+    }
+
+    @Test(expected = SQLException.class)
+    public void throwIfInsertNameAlreadyExists() throws SQLException {
+        List<GroupDto> all = groupDao.getAllGroups();
+        groupDao.insertNewGroup(all.get(0));
     }
 
     @After

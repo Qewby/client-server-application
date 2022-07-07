@@ -1,4 +1,4 @@
-package com.qewby.network.dao.mapper;
+package com.qewby.network.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

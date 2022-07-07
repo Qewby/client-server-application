@@ -1,4 +1,4 @@
-package com.qewby.network.executor;
+package com.qewby.network.executor.implementation;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,7 +8,8 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.qewby.network.dao.mapper.RowMapper;
+import com.qewby.network.dao.RowMapper;
+import com.qewby.network.executor.SQLExecutor;
 
 public class SQLiteExecutor implements SQLExecutor {
     private static String databaseName = null;

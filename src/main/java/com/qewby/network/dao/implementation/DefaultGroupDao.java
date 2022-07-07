@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Optional;
 
 import com.qewby.network.dao.GroupDao;
+import com.qewby.network.dao.RowMapper;
 import com.qewby.network.dao.mapper.GroupDtoMapper;
-import com.qewby.network.dao.mapper.RowMapper;
 import com.qewby.network.dto.GroupDto;
 import com.qewby.network.executor.SQLExecutor;
-import com.qewby.network.executor.SQLiteExecutor;
+import com.qewby.network.executor.implementation.SQLiteExecutor;
 
 public class DefaultGroupDao implements GroupDao {
 
@@ -18,6 +18,7 @@ public class DefaultGroupDao implements GroupDao {
 
     private static final String GET_ALL_GROUPS = "SELECT * FROM `group`";
     private static final String GET_GROUP_BY_ID = "SELECT * FROM `group` WHERE `group_id` = ?";
+    private static final String GET_GROUP_BY_NAME = "SELECT * FROM `group` WHERE `group_name` = ?";
     private static final String INSERT_NEW_GROUP = "INSERT INTO `group`\n" +
             "(`group_id`,`group_name`,`group_description`)\n" +
             "VALUES (NULL, ?, ?)";
@@ -34,7 +35,7 @@ public class DefaultGroupDao implements GroupDao {
     }
 
     @Override
-    public Optional<GroupDto> getGroupById(int id) throws SQLException {
+    public Optional<GroupDto> getGroupById(final int id) throws SQLException {
         RowMapper<GroupDto> mapper = new GroupDtoMapper();
         List<Object> parameterList = new LinkedList<>();
         parameterList.add(id);
@@ -43,7 +44,16 @@ public class DefaultGroupDao implements GroupDao {
     }
 
     @Override
-    public int insertNewGroup(GroupDto groupDto) throws SQLException {
+    public Optional<GroupDto> getGroupByName(String name) throws SQLException {
+        RowMapper<GroupDto> mapper = new GroupDtoMapper();
+        List<Object> parameterList = new LinkedList<>();
+        parameterList.add(name);
+        List<GroupDto> list = executor.executeQuery(GET_GROUP_BY_NAME, parameterList, mapper);
+        return list.stream().findFirst();
+    }
+
+    @Override
+    public int insertNewGroup(final GroupDto groupDto) throws SQLException {
         List<Object> parameterList = new LinkedList<>();
         parameterList.add(groupDto.getName());
         parameterList.add(groupDto.getDescription());
@@ -51,7 +61,7 @@ public class DefaultGroupDao implements GroupDao {
     }
 
     @Override
-    public int updateGroupInfo(GroupDto groupDto) throws SQLException {
+    public int updateGroupInfo(final GroupDto groupDto) throws SQLException {
         List<Object> parameterList = new LinkedList<>();
         parameterList.add(groupDto.getName());
         parameterList.add(groupDto.getDescription());
@@ -60,7 +70,7 @@ public class DefaultGroupDao implements GroupDao {
     }
 
     @Override
-    public int deleteGroupById(int id) throws SQLException {
+    public int deleteGroupById(final int id) throws SQLException {
         List<Object> parameterList = new LinkedList<>();
         parameterList.add(id);
         return executor.update(DELETE_GROUP_BY_ID, parameterList);
