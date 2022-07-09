@@ -11,6 +11,6 @@ public class EmptyHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        ErrorSender.sendErrorMessage(exchange, 500, "Internal server error");
+        ResponseSender.sendErrorMessage(exchange, 500, "Internal server error");
     }
 }

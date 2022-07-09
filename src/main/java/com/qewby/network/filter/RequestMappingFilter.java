@@ -2,10 +2,11 @@ package com.qewby.network.filter;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,18 +17,32 @@ import com.google.gson.JsonSyntaxException;
 import com.qewby.network.annotation.PathParameter;
 import com.qewby.network.annotation.RequestBody;
 import com.qewby.network.annotation.RequestMapping;
+import com.qewby.network.annotation.RequestParameter;
 import com.qewby.network.dto.ResponseDto;
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.HttpExchange;
 
-public class PathFilter extends Filter {
+public class RequestMappingFilter extends Filter {
     private static final Gson gson = new Gson();
 
     private Method handler;
 
-    public PathFilter(Method handler) {
+    public RequestMappingFilter(Method handler) {
         super();
         this.handler = handler;
+    }
+
+    private Map<String, String> parseRequestParameters(String requestQuery) throws UnsupportedEncodingException {
+        Map<String, String> parameterMap = new HashMap<>();
+        if (requestQuery != null) {
+            String[] pairs = requestQuery.split("\\&");
+            for (String pair : pairs) {
+                int idx = pair.indexOf("=");
+                parameterMap.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
+                        URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+            }
+        }
+        return parameterMap;
     }
 
     private Map<String, String> comparePaths(String handlerPath, String requestPath) {
@@ -61,6 +76,8 @@ public class PathFilter extends Filter {
                 chain.doFilter(exchange);
             } else {
 
+                Map<String, String> requestParameters = parseRequestParameters(exchange.getRequestURI().getQuery());
+
                 List<Object> handlerParameters = new LinkedList<>();
                 Parameter[] parameters = handler.getParameters();
                 for (Parameter param : parameters) {
@@ -72,11 +89,26 @@ public class PathFilter extends Filter {
                     if (bodyParameter != null) {
                         InputStream input = exchange.getRequestBody();
                         String body = new String(input.readAllBytes());
+                        if (body.isEmpty()) {
+                            ResponseSender.sendErrorMessage(exchange, 400, "Request body is required");
+                            return;
+                        }
                         try {
                             handlerParameters.add(gson.fromJson(body, param.getType()));
                         } catch (JsonSyntaxException jsonSyntaxException) {
                             jsonSyntaxException.printStackTrace();
-                            ErrorSender.sendErrorMessage(exchange, 400, "Bad body json syntax");
+                            ResponseSender.sendErrorMessage(exchange, 400, "Bad body json syntax");
+                            return;
+                        }
+                    }
+                    RequestParameter requestParameter = param.getAnnotation(RequestParameter.class);
+                    if (requestParameter != null) {
+                        String key = requestParameter.value();
+                        if (requestParameter.require() && !requestParameters.containsKey(key)) {
+                            ResponseSender.sendErrorMessage(exchange, 400, key + " query parameter is required");
+                            return;
+                        } else {
+                            handlerParameters.add(requestParameters.get(key));
                         }
                     }
                 }
@@ -85,21 +117,12 @@ public class PathFilter extends Filter {
                 Constructor<?> constructor;
                 constructor = handler.getDeclaringClass().getConstructor();
                 responseDto = (ResponseDto) handler.invoke(constructor.newInstance(), handlerParameters.toArray());
-
-                String response = null;
-                if (responseDto.getObject() != null) {
-                    response = gson.toJson(responseDto.getObject());
-                    exchange.sendResponseHeaders(responseDto.getStatus(), response.getBytes().length);
-                    OutputStream os = exchange.getResponseBody();
-                    os.write(response.getBytes());
-                    os.close();
-                } else {
-                    ErrorSender.sendErrorMessage(exchange, responseDto.getStatus(), responseDto.getErrorMessage());
-                }
+                ResponseSender.sendResponse(exchange, responseDto);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            ErrorSender.sendErrorMessage(exchange, 500, "Internal server error");
+            ResponseSender.sendErrorMessage(exchange, 500, "Internal server error");
+            return;
         }
     }
 

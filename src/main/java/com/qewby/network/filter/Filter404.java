@@ -9,7 +9,7 @@ public class Filter404 extends Filter {
     @Override
     public void doFilter(HttpExchange exchange, Chain chain) throws IOException {
         try {
-            ErrorSender.sendErrorMessage(exchange, 404, "Path not found");
+            ResponseSender.sendErrorMessage(exchange, 404, "Path not found");
         } catch (Exception e) {
             e.printStackTrace();
         }

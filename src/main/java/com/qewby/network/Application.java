@@ -17,7 +17,7 @@ import com.qewby.network.executor.SQLExecutor;
 import com.qewby.network.executor.implementation.SQLiteExecutor;
 import com.qewby.network.filter.Filter404;
 import com.qewby.network.filter.EmptyHandler;
-import com.qewby.network.filter.PathFilter;
+import com.qewby.network.filter.RequestMappingFilter;
 import com.qewby.network.filter.SetJsonFilter;
 
 public class Application {
@@ -74,7 +74,7 @@ public class Application {
                         context.getFilters().add(new SetJsonFilter());
                         contextMap.put(path, context);
                     }
-                    contextMap.get(path).getFilters().add(new PathFilter(method));
+                    contextMap.get(path).getFilters().add(new RequestMappingFilter(method));
                 }
             }
             for (HttpContext context : contextMap.values()) {

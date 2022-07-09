@@ -4,6 +4,7 @@ import com.qewby.network.annotation.PathParameter;
 import com.qewby.network.annotation.RequestBody;
 import com.qewby.network.annotation.RequestMapping;
 import com.qewby.network.annotation.RequestMethod;
+import com.qewby.network.annotation.RequestParameter;
 import com.qewby.network.annotation.RestController;
 import com.qewby.network.dto.GroupDto;
 import com.qewby.network.dto.ResponseDto;
@@ -30,10 +31,15 @@ public class GroupController {
     }
 
     @RequestMapping(path = "/api/group/{id}", method = RequestMethod.POST)
-    public ResponseDto updateGroupById(@PathParameter("id") String id, @RequestBody GroupDto group) {
+    public ResponseDto updateGroupById(@PathParameter("id") String id, @RequestBody GroupDto group, @RequestParameter("name") String name) {
         System.out.println(id);
         if (group != null) {
             System.out.println(group.toString());
+        } else {
+            System.out.println("NULL");
+        }
+        if (name != null) {
+            System.out.println(name);
         } else {
             System.out.println("NULL");
         }
