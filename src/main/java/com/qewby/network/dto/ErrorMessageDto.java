@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorMessageDto {
-    private int statusCode;
+    private Integer statusCode;
     private String message;
     private Date timestamp;
 }

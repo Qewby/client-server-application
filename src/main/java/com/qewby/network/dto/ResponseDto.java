@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ResponseDto {
     private Object object;
-    private int status; 
-    private ErrorMessageDto error;
+    private Integer status; 
+    private String errorMessage;
 }

@@ -7,15 +7,11 @@ import java.sql.Timestamp;
 import com.google.gson.Gson;
 import com.qewby.network.dto.ErrorMessageDto;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 
-public class Default404Handler implements HttpHandler {
+public class ErrorSender {
     private static final Gson gson = new Gson();
 
-    @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        int statusCode = 404;
-        String message = "Page not found";
+    public static void sendErrorMessage(HttpExchange exchange, int statusCode, String message) throws IOException {
         ErrorMessageDto errorMessageDto = new ErrorMessageDto(statusCode, message,
                 new Timestamp(System.currentTimeMillis()));
         String response = gson.toJson(errorMessageDto);

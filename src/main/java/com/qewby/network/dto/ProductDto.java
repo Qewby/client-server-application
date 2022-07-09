@@ -11,7 +11,7 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductDto {
-    private int id;
+    private Integer id;
     @With
     private String name;
     @With
@@ -21,7 +21,7 @@ public class ProductDto {
     @With
     private String manufacturer;
     @With
-    private int number;
+    private Integer number;
     @With
     private BigDecimal price;
 }

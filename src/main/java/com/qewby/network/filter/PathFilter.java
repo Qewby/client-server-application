@@ -1,9 +1,9 @@
 package com.qewby.network.filter;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.qewby.network.annotation.PathParameter;
+import com.qewby.network.annotation.RequestBody;
 import com.qewby.network.annotation.RequestMapping;
 import com.qewby.network.dto.ResponseDto;
 import com.sun.net.httpserver.Filter;
@@ -62,35 +64,48 @@ public class PathFilter extends Filter {
                 List<Object> handlerParameters = new LinkedList<>();
                 Parameter[] parameters = handler.getParameters();
                 for (Parameter param : parameters) {
-                    String pathParameter = param.getAnnotation(PathParameter.class).value();
+                    PathParameter pathParameter = param.getAnnotation(PathParameter.class);
                     if (pathParameter != null) {
-                        handlerParameters.add(pathParameters.get(pathParameter));
+                        handlerParameters.add(pathParameters.get(pathParameter.value()));
+                    }
+                    RequestBody bodyParameter = param.getAnnotation(RequestBody.class);
+                    if (bodyParameter != null) {
+                        InputStream input = exchange.getRequestBody();
+                        String body = new String(input.readAllBytes());
+                        try {
+                            handlerParameters.add(gson.fromJson(body, param.getType()));
+                        } catch (JsonSyntaxException jsonSyntaxException) {
+                            jsonSyntaxException.printStackTrace();
+                            ErrorSender.sendErrorMessage(exchange, 400, "Bad body json syntax");
+                        }
                     }
                 }
 
                 ResponseDto responseDto = null;
                 Constructor<?> constructor;
-                try {
-                    constructor = handler.getDeclaringClass().getConstructor();
-                    responseDto = (ResponseDto) handler.invoke(constructor.newInstance(), handlerParameters.toArray());
-                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-                        | InvocationTargetException | InstantiationException e) {
-                    e.printStackTrace();
+                constructor = handler.getDeclaringClass().getConstructor();
+                responseDto = (ResponseDto) handler.invoke(constructor.newInstance(), handlerParameters.toArray());
+
+                String response = null;
+                if (responseDto.getObject() != null) {
+                    response = gson.toJson(responseDto.getObject());
+                    exchange.sendResponseHeaders(responseDto.getStatus(), response.getBytes().length);
+                    OutputStream os = exchange.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                } else {
+                    ErrorSender.sendErrorMessage(exchange, responseDto.getStatus(), responseDto.getErrorMessage());
                 }
-                String response = gson.toJson(responseDto.getObject());
-                exchange.sendResponseHeaders(responseDto.getStatus(), response.getBytes().length);
-                OutputStream os = exchange.getResponseBody();
-                os.write(response.getBytes());
-                os.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
+            ErrorSender.sendErrorMessage(exchange, 500, "Internal server error");
         }
     }
 
     @Override
     public String description() {
-        return "Filter checks if request path match method mapping and set parameters";
+        return "Filter checks if request path match method mapping and send response if match";
     }
 
 }

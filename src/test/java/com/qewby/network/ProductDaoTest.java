@@ -67,7 +67,7 @@ public class ProductDaoTest {
 
     @Test
     public void getByGroupShouldReturnOnlyProductsWithSameGroup() throws SQLException {
-        int groupId = 1;
+        Integer groupId = 1;
         List<ProductDto> list = productDao.getProductsByGroupId(groupId);
         assertEquals(2, list.size());
         for (ProductDto prod : list) {

@@ -15,7 +15,8 @@ import com.qewby.network.annotation.RequestMapping;
 import com.qewby.network.annotation.RestController;
 import com.qewby.network.executor.SQLExecutor;
 import com.qewby.network.executor.implementation.SQLiteExecutor;
-import com.qewby.network.filter.Default404Handler;
+import com.qewby.network.filter.Filter404;
+import com.qewby.network.filter.EmptyHandler;
 import com.qewby.network.filter.PathFilter;
 import com.qewby.network.filter.SetJsonFilter;
 
@@ -53,6 +54,11 @@ public class Application {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         Map<String, HttpContext> contextMap = new HashMap<>();
 
+        HttpContext rootContext = server.createContext("/", new EmptyHandler());
+        rootContext.getFilters().add(new SetJsonFilter());
+        rootContext.getFilters().add(new Filter404());
+        contextMap.put("/", rootContext);
+
         Reflections reflections = new Reflections(Application.class.getPackageName());
         Set<Class<?>> classes = reflections.getTypesAnnotatedWith(RestController.class);
         for (Class<?> clazz : classes) {
@@ -64,16 +70,18 @@ public class Application {
                     }
                     if (!contextMap.containsKey(path)) {
                         HttpContext context = server.createContext(path,
-                                new Default404Handler());
+                                new EmptyHandler());
                         context.getFilters().add(new SetJsonFilter());
                         contextMap.put(path, context);
                     }
                     contextMap.get(path).getFilters().add(new PathFilter(method));
                 }
             }
+            for (HttpContext context : contextMap.values()) {
+                context.getFilters().add(new Filter404());
+            }
         }
 
-        server.createContext("/", new Default404Handler()).getFilters().add(new SetJsonFilter());
         server.start();
     }
 }

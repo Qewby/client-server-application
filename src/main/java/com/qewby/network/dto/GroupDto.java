@@ -9,7 +9,7 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupDto {
-    private int id;
+    private Integer id;
     @With
     private String name;
     @With

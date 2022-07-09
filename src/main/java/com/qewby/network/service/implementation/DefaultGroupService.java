@@ -1,11 +1,9 @@
 package com.qewby.network.service.implementation;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
 
 import com.qewby.network.dao.GroupDao;
 import com.qewby.network.dao.implementation.DefaultGroupDao;
-import com.qewby.network.dto.ErrorMessageDto;
 import com.qewby.network.dto.ResponseDto;
 import com.qewby.network.service.GroupService;
 
@@ -20,9 +18,9 @@ public class DefaultGroupService implements GroupService {
             responseDto.setStatus(200);
         } catch (SQLException e) {
             e.printStackTrace();
+            responseDto.setObject(null);
             responseDto.setStatus(500);
-            responseDto.setError(
-                    new ErrorMessageDto(500, "Internal server error", new Timestamp(System.currentTimeMillis())));
+            responseDto.setErrorMessage("Internal server error");
         }
         return responseDto;
     }
