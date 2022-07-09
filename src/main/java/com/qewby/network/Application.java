@@ -34,11 +34,11 @@ public class Application {
                 "`group_name`	TEXT NOT NULL UNIQUE,\n" +
                 "`group_description`	TEXT)";
 
-        String createProductTableQuery = "CREATE TABLE IF NOT EXISTS `product` (\n" +
-                "`product_id`	INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
-                "`product_name`	TEXT NOT NULL UNIQUE,\n" +
+        String createGoodTableQuery = "CREATE TABLE IF NOT EXISTS `good` (\n" +
+                "`good_id`	INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
+                "`good_name`	TEXT NOT NULL UNIQUE,\n" +
                 "`group_id`	INTEGER NOT NULL,\n" +
-                "`product_description`	TEXT,\n" +
+                "`good_description`	TEXT,\n" +
                 "`manufacturer`	TEXT,\n" +
                 "`number`	INTEGER NOT NULL,\n" +
                 "`price`	NUMERIC NOT NULL,\n" +
@@ -50,7 +50,7 @@ public class Application {
         SQLiteExecutor.setDatabaseName(name);
         SQLExecutor executor = new SQLiteExecutor();
         executor.update(createGroupTableQuery);
-        executor.update(createProductTableQuery);
+        executor.update(createGoodTableQuery);
         executor.update(createUserTableQuery);
 
         UserService userService = new DefaultUserService();

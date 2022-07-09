@@ -10,7 +10,7 @@ import lombok.With;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDto {
+public class GoodDto {
     private Integer id;
     @With
     private String name;
