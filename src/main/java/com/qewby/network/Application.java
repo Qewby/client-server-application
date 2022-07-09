@@ -4,18 +4,19 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.reflections.Reflections;
 
 import com.sun.net.httpserver.*;
-import com.qewby.network.annotation.GetMapping;
+import com.qewby.network.annotation.RequestMapping;
 import com.qewby.network.annotation.RestController;
 import com.qewby.network.executor.SQLExecutor;
 import com.qewby.network.executor.implementation.SQLiteExecutor;
 import com.qewby.network.filter.Default404Handler;
-import com.qewby.network.filter.Default405Handler;
-import com.qewby.network.filter.GetFilter;
+import com.qewby.network.filter.PathFilter;
 import com.qewby.network.filter.SetJsonFilter;
 
 public class Application {
@@ -50,16 +51,24 @@ public class Application {
         Application application = new Application();
         application.initializeDatabase("data.db");
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        Map<String, HttpContext> contextMap = new HashMap<>();
 
         Reflections reflections = new Reflections(Application.class.getPackageName());
         Set<Class<?>> classes = reflections.getTypesAnnotatedWith(RestController.class);
         for (Class<?> clazz : classes) {
             for (Method method : clazz.getMethods()) {
-                if (method.isAnnotationPresent(GetMapping.class)) {
-                    HttpContext context = server.createContext(method.getAnnotation(GetMapping.class).value(),
-                            new Default405Handler());
-                    context.getFilters().add(new SetJsonFilter());
-                    context.getFilters().add(new GetFilter(method));
+                if (method.isAnnotationPresent(RequestMapping.class)) {
+                    String path = method.getAnnotation(RequestMapping.class).path();
+                    if (path.contains("{")) {
+                        path = path.substring(0, path.indexOf('{'));
+                    }
+                    if (!contextMap.containsKey(path)) {
+                        HttpContext context = server.createContext(path,
+                                new Default404Handler());
+                        context.getFilters().add(new SetJsonFilter());
+                        contextMap.put(path, context);
+                    }
+                    contextMap.get(path).getFilters().add(new PathFilter(method));
                 }
             }
         }
