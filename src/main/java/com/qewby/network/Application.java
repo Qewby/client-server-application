@@ -13,12 +13,15 @@ import org.reflections.Reflections;
 import com.sun.net.httpserver.*;
 import com.qewby.network.annotation.RequestMapping;
 import com.qewby.network.annotation.RestController;
+import com.qewby.network.dto.UserDto;
 import com.qewby.network.executor.SQLExecutor;
 import com.qewby.network.executor.implementation.SQLiteExecutor;
 import com.qewby.network.filter.Filter404;
 import com.qewby.network.filter.EmptyHandler;
 import com.qewby.network.filter.RequestMappingFilter;
 import com.qewby.network.filter.SetJsonFilter;
+import com.qewby.network.service.UserService;
+import com.qewby.network.service.implementation.DefaultUserService;
 
 public class Application {
 
@@ -46,6 +49,9 @@ public class Application {
         executor.update(createGroupTableQuery);
         executor.update(createProductTableQuery);
         executor.update(createUserTableQuery);
+
+        UserService userService = new DefaultUserService();
+        userService.createNewUser(new UserDto("root", "root"));
     }
 
     public static void main(String[] args) throws IOException, SQLException {
