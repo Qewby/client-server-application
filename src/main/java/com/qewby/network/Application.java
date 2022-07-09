@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,6 +19,7 @@ import com.qewby.network.dto.UserDto;
 import com.qewby.network.executor.SQLExecutor;
 import com.qewby.network.executor.implementation.SQLiteExecutor;
 import com.qewby.network.filter.Filter404;
+import com.qewby.network.filter.AuthJwtFilter;
 import com.qewby.network.filter.EmptyHandler;
 import com.qewby.network.filter.RequestMappingFilter;
 import com.qewby.network.filter.SetJsonFilter;
@@ -61,9 +64,21 @@ public class Application {
         Map<String, HttpContext> contextMap = new HashMap<>();
 
         HttpContext rootContext = server.createContext("/", new EmptyHandler());
+        rootContext.setAuthenticator(new BasicAuthenticator("hello") {
+            @Override
+            public boolean checkCredentials(String username, String password) {
+                if (username.equals("username") && password.equals("password")) {
+                    return true;
+                }
+                return false;
+            }
+        });
         rootContext.getFilters().add(new SetJsonFilter());
+        rootContext.getFilters().add(new AuthJwtFilter());
         rootContext.getFilters().add(new Filter404());
         contextMap.put("/", rootContext);
+
+        List<String> allowWithoutAuth = Arrays.asList("/login");
 
         Reflections reflections = new Reflections(Application.class.getPackageName());
         Set<Class<?>> classes = reflections.getTypesAnnotatedWith(RestController.class);
@@ -78,6 +93,9 @@ public class Application {
                         HttpContext context = server.createContext(path,
                                 new EmptyHandler());
                         context.getFilters().add(new SetJsonFilter());
+                        if (!allowWithoutAuth.contains(path)) {
+                            context.getFilters().add(new AuthJwtFilter());
+                        }
                         contextMap.put(path, context);
                     }
                     contextMap.get(path).getFilters().add(new RequestMappingFilter(method));

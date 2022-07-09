@@ -16,8 +16,8 @@ import com.qewby.network.dto.UserDto;
 import com.qewby.network.security.AuthenticationUtils;
 import com.qewby.network.service.UserService;
 
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.SignatureException;
 
 public class DefaultUserService implements UserService {
 
@@ -95,7 +95,7 @@ public class DefaultUserService implements UserService {
                     .parseClaimsJws(jwtTokenDto.getToken());
             responseDto.setObject(jwtTokenDto);
             responseDto.setStatus(200);
-        } catch (SignatureException e) {
+        } catch (JwtException e) {
             responseDto.setStatus(403);
             responseDto.setErrorMessage("Invalid token");
         } catch (Exception e) {
