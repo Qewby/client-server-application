@@ -1,5 +1,7 @@
 package com.qewby.network.service.implementation;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -10,14 +12,15 @@ import javax.crypto.SecretKey;
 
 import com.qewby.network.dao.UserDao;
 import com.qewby.network.dao.implementation.DefaultUserDao;
-import com.qewby.network.dto.JWTTokenDto;
-import com.qewby.network.dto.ResponseDto;
+import com.qewby.network.dto.JwtTokenDto;
 import com.qewby.network.dto.UserDto;
+import com.qewby.network.exception.ResponseErrorException;
 import com.qewby.network.security.AuthenticationUtils;
 import com.qewby.network.service.UserService;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.InvalidKeyException;
 
 public class DefaultUserService implements UserService {
 
@@ -26,8 +29,7 @@ public class DefaultUserService implements UserService {
     UserDao userDao = new DefaultUserDao();
 
     @Override
-    public ResponseDto loginUserAndReturnJwt(UserDto credentials) {
-        ResponseDto responseDto = new ResponseDto();
+    public JwtTokenDto loginUserAndReturnJwt(UserDto credentials) {
         try {
             Optional<UserDto> userData = userDao.getUserByLogin(credentials.getLogin());
             if (userData.isPresent()) {
@@ -41,68 +43,50 @@ public class DefaultUserService implements UserService {
                             .setExpiration(Timestamp.valueOf(LocalDateTime.now().plusHours(JWT_EXPIRATION_HOURS)))
                             .signWith(key)
                             .compact();
-                    responseDto.setObject(new JWTTokenDto(jwt));
-                    responseDto.setStatus(200);
+                    return new JwtTokenDto(jwt);
                 } else {
-                    responseDto.setStatus(401);
-                    responseDto.setErrorMessage("Invalid credentials");
+                    throw new ResponseErrorException(401, "Invalid credentials");
                 }
             } else {
-                responseDto.setStatus(401);
-                responseDto.setErrorMessage("No such user");
+                throw new ResponseErrorException(401, "No such user");
             }
-        } catch (Exception e) {
+        } catch (SQLException | InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             e.printStackTrace();
-            responseDto.setStatus(500);
-            responseDto.setErrorMessage("Internal server error");
+            throw new ResponseErrorException(500);
         }
-        return responseDto;
     }
 
     @Override
-    public ResponseDto createNewUser(final UserDto userDto) {
-        ResponseDto responseDto = new ResponseDto();
+    public UserDto createNewUser(final UserDto userDto) {
         try {
             if (userDao.getUserByLogin(userDto.getLogin()).isPresent()) {
-                responseDto.setStatus(409);
-                responseDto.setErrorMessage("User with such login already exists");
+                throw new ResponseErrorException(409, "User with such login already exists");
             } else {
                 userDto.setPassword(AuthenticationUtils.generatePasswordHash(userDto.getPassword(), 10));
                 int rowCount = userDao.insertNewUser(userDto);
                 if (rowCount == 1) {
-                    responseDto.setObject(userDto);
-                    responseDto.setStatus(201);
+                    return userDto;
                 } else {
                     throw new SQLException();
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             e.printStackTrace();
-            responseDto.setStatus(500);
-            responseDto.setErrorMessage("Internal server error");
+            throw new ResponseErrorException(500);
         }
-        return responseDto;
     }
 
     @Override
-    public ResponseDto validateUserJwt(final JWTTokenDto jwtTokenDto) {
-        ResponseDto responseDto = new ResponseDto();
+    public boolean validateUserJwt(final JwtTokenDto jwtTokenDto) {
         try {
             SecretKey key = AuthenticationUtils.getKey();
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(jwtTokenDto.getToken());
-            responseDto.setObject(jwtTokenDto);
-            responseDto.setStatus(200);
+            return true;
         } catch (JwtException e) {
-            responseDto.setStatus(403);
-            responseDto.setErrorMessage("Invalid token");
-        } catch (Exception e) {
-            e.printStackTrace();
-            responseDto.setStatus(500);
-            responseDto.setErrorMessage("Internal server error");
+            throw new ResponseErrorException(403, "Invalid token");
         }
-        return responseDto;
     }
 }

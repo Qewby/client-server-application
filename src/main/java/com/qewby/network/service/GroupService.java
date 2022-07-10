@@ -1,7 +1,9 @@
 package com.qewby.network.service;
 
-import com.qewby.network.dto.ResponseDto;
+import java.util.List;
+
+import com.qewby.network.dto.GroupDto;
 
 public interface GroupService {
-    ResponseDto getAllGroups();
+    List<GroupDto> getAllGroups();
 }

@@ -54,13 +54,16 @@ public class Application {
         executor.update(createUserTableQuery);
 
         UserService userService = new DefaultUserService();
-        userService.createNewUser(new UserDto("root", "root"));
+        try {
+            userService.createNewUser(new UserDto("root", "root"));
+        } catch (Exception e) {
+        }
     }
 
     public static void main(String[] args) throws IOException, SQLException {
         Application application = new Application();
         application.initializeDatabase("data.db");
-        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress(8081), 0);
         Map<String, HttpContext> contextMap = new HashMap<>();
 
         HttpContext rootContext = server.createContext("/", new EmptyHandler());

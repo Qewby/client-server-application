@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -18,7 +19,7 @@ import com.qewby.network.annotation.PathParameter;
 import com.qewby.network.annotation.RequestBody;
 import com.qewby.network.annotation.RequestMapping;
 import com.qewby.network.annotation.RequestParameter;
-import com.qewby.network.dto.ResponseDto;
+import com.qewby.network.exception.ResponseErrorException;
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.HttpExchange;
 
@@ -71,9 +72,11 @@ public class RequestMappingFilter extends Filter {
                     exchange.getRequestURI().getPath().trim());
             if (pathParameters == null) {
                 chain.doFilter(exchange);
+                return;
             } else if (!handler.getAnnotation(RequestMapping.class).method().name()
                     .equals(exchange.getRequestMethod())) {
                 chain.doFilter(exchange);
+                return;
             } else {
 
                 Map<String, String> requestParameters = parseRequestParameters(exchange.getRequestURI().getQuery());
@@ -90,35 +93,42 @@ public class RequestMappingFilter extends Filter {
                         InputStream input = exchange.getRequestBody();
                         String body = new String(input.readAllBytes());
                         if (body.isEmpty()) {
-                            ResponseSender.sendErrorMessage(exchange, 400, "Request body is required");
-                            return;
+                            throw new ResponseErrorException(400, "Request body is required");
                         }
                         try {
                             handlerParameters.add(gson.fromJson(body, param.getType()));
-                        } catch (JsonSyntaxException jsonSyntaxException) {
-                            jsonSyntaxException.printStackTrace();
-                            ResponseSender.sendErrorMessage(exchange, 400, "Bad body json syntax");
-                            return;
+                        } catch (JsonSyntaxException e) {
+                            e.printStackTrace();
+                            throw new ResponseErrorException(400, "Bad body json syntax");
                         }
                     }
                     RequestParameter requestParameter = param.getAnnotation(RequestParameter.class);
                     if (requestParameter != null) {
                         String key = requestParameter.value();
                         if (requestParameter.require() && !requestParameters.containsKey(key)) {
-                            ResponseSender.sendErrorMessage(exchange, 400, key + " query parameter is required");
-                            return;
+                            throw new ResponseErrorException(400, key + " query parameter is required");
                         } else {
                             handlerParameters.add(requestParameters.get(key));
                         }
                     }
                 }
 
-                ResponseDto responseDto = null;
                 Constructor<?> constructor;
                 constructor = handler.getDeclaringClass().getConstructor();
-                responseDto = (ResponseDto) handler.invoke(constructor.newInstance(), handlerParameters.toArray());
-                ResponseSender.sendResponse(exchange, responseDto);
+                Object response = handler.invoke(constructor.newInstance(), handlerParameters.toArray());
+                ResponseSender.sendResponse(exchange, 200, response);
             }
+        } catch (InvocationTargetException e) {
+            if (e.getCause() instanceof ResponseErrorException) {
+                ResponseErrorException errorException = (ResponseErrorException) e.getCause();
+                ResponseSender.sendErrorMessage(exchange, errorException.getStatusCode(),
+                        errorException.getMessage());
+            } else {
+                e.printStackTrace();
+                ResponseSender.sendErrorMessage(exchange, 500, "Internal server error");
+            }
+        } catch (ResponseErrorException e) {
+            ResponseSender.sendErrorMessage(exchange, e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             ResponseSender.sendErrorMessage(exchange, 500, "Internal server error");
