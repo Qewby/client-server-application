@@ -19,10 +19,7 @@ public class AuthJwtFilter extends Filter {
 
     @Override
     public void doFilter(HttpExchange exchange, Chain chain) throws IOException {
-        chain.doFilter(exchange);
-        /* if (1 == 1) {
-            return;
-        } */
+        //chain.doFilter(exchange);
         try {
             List<String> authHeader = exchange.getRequestHeaders().get(HEADER_NAME);
             if (authHeader == null || authHeader.isEmpty()) {
