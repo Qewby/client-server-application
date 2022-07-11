@@ -24,3 +24,9 @@ hs_err_pid*
 
 # maven build path
 target/
+
+# VS Code configuration
+.vscode/
+
+# node modules
+*/node_modules/
