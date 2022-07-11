@@ -5,6 +5,7 @@ import Login from "./login/Login";
 import RouteProtector from "./login/components/RouteProtector";
 import AuthProvider from "./login/components/AuthProvider";
 import DashboardLayout from "./common/components/DashboardLayout";
+import Groups from "./common/components/Groups";
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
               </RouteProtector>
             }
           >
-            <Route path="groups" element={<h1>Groups</h1>} />
+            <Route path="groups" element={<Groups />} />
             <Route path="goods" element={<h1>Goods</h1>} />
           </Route>
           <Route path="*" element={<Navigate to="/goods" replace/>} />
