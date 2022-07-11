@@ -10,19 +10,18 @@ import lombok.With;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GoodDto {
+public class GoodGroupDto {
     private Integer id;
     @With
     private String name;
     @With
-    private GroupDto group;
+    private Integer group_id;
     @With
     private String description;
     @With
     private String manufacturer;
     @With
     private Integer number;
-
     @With
     private BigDecimal price;
 }
