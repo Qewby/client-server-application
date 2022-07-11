@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -23,8 +24,8 @@ public class GroupDaoTest {
     private static final String testDatabaseName = "test.db";
 
     @Before
-    public void createTestDatabase() throws SQLException {
-        Application application = new Application();
+    public void createTestDatabase() throws SQLException, IOException {
+        Application application = new Application(8080);
         application.initializeDatabase(testDatabaseName);
 
         GroupDto groupDto = new GroupDto();
