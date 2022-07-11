@@ -1,9 +1,11 @@
 package com.qewby.network.filter;
 
 import java.io.IOException;
+import java.net.UnknownServiceException;
 import java.util.List;
 
 import com.qewby.network.dto.JwtTokenDto;
+import com.qewby.network.exception.ResponseErrorException;
 import com.qewby.network.service.UserService;
 import com.qewby.network.service.implementation.DefaultUserService;
 import com.sun.net.httpserver.Filter;
@@ -18,37 +20,35 @@ public class AuthJwtFilter extends Filter {
     @Override
     public void doFilter(HttpExchange exchange, Chain chain) throws IOException {
         chain.doFilter(exchange);
-        if (1 == 1) {
+        /* if (1 == 1) {
             return;
-        }
+        } */
         try {
             List<String> authHeader = exchange.getRequestHeaders().get(HEADER_NAME);
             if (authHeader == null || authHeader.isEmpty()) {
-                ResponseSender.sendErrorMessage(exchange, 403, HEADER_NAME + " required");
-                return;
+                throw new ResponseErrorException(403, HEADER_NAME + " required");
             }
             String headerValue = authHeader.get(0);
             String[] values = headerValue.split("\\s+");
             if (values.length != 2) {
-                ResponseSender.sendErrorMessage(exchange, 403, "Invalid " + HEADER_NAME + " header value");
-                return;
+                throw new ResponseErrorException(403, "Invalid " + HEADER_NAME + " header value");
             }
             String schema = values[0];
             String token = values[1];
             if (!schema.equals("Bearer")) {
-                ResponseSender.sendErrorMessage(exchange, 403, "Invalid " + HEADER_NAME + " schema");
-                return;
+                throw new ResponseErrorException( 403, "Invalid " + HEADER_NAME + " schema");
             }
             boolean valid = userService.validateUserJwt(new JwtTokenDto(token));
             if (valid) {
                 chain.doFilter(exchange);
             } else {
-                ResponseSender.sendResponse(exchange, 403, "I");
+                throw new UnknownServiceException();
             }
+        } catch (ResponseErrorException e) {
+            ResponseSender.sendErrorMessage(exchange, e.getStatusCode(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             ResponseSender.sendErrorMessage(exchange, 500, "Internal server error");
-            return;
         }
     }
 

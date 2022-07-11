@@ -28,6 +28,12 @@ import com.qewby.network.service.implementation.DefaultUserService;
 
 public class Application {
 
+    private HttpServer server;
+
+    public Application(final int port) throws IOException {
+        server = HttpServer.create(new InetSocketAddress(8080), 0);
+    }
+
     public void initializeDatabase(String name) throws SQLException {
         String createGroupTableQuery = "CREATE TABLE IF NOT EXISTS `group` (\n" +
                 "`group_id`	INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
@@ -60,28 +66,15 @@ public class Application {
         }
     }
 
-    public static void main(String[] args) throws IOException, SQLException {
-        Application application = new Application();
-        application.initializeDatabase("data.db");
-        HttpServer server = HttpServer.create(new InetSocketAddress(8081), 0);
+    public void createContextes() {
         Map<String, HttpContext> contextMap = new HashMap<>();
+        List<String> allowWithoutAuth = Arrays.asList("/login");
 
         HttpContext rootContext = server.createContext("/", new EmptyHandler());
-        rootContext.setAuthenticator(new BasicAuthenticator("hello") {
-            @Override
-            public boolean checkCredentials(String username, String password) {
-                if (username.equals("username") && password.equals("password")) {
-                    return true;
-                }
-                return false;
-            }
-        });
         rootContext.getFilters().add(new SetJsonFilter());
         rootContext.getFilters().add(new AuthJwtFilter());
         rootContext.getFilters().add(new Filter404());
         contextMap.put("/", rootContext);
-
-        List<String> allowWithoutAuth = Arrays.asList("/login");
 
         Reflections reflections = new Reflections(Application.class.getPackageName());
         Set<Class<?>> classes = reflections.getTypesAnnotatedWith(RestController.class);
@@ -108,7 +101,16 @@ public class Application {
                 context.getFilters().add(new Filter404());
             }
         }
+    }
 
+    public void start() {
         server.start();
+    }
+
+    public static void main(String[] args) throws SQLException, IOException {
+        Application application = new Application(8080);
+        application.initializeDatabase("data.db");
+        application.createContextes();
+        application.start();
     }
 }
