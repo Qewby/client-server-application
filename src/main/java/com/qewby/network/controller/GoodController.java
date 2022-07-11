@@ -6,8 +6,11 @@ import com.qewby.network.annotation.RequestMapping;
 import com.qewby.network.annotation.RequestMethod;
 import com.qewby.network.annotation.RestController;
 import com.qewby.network.dto.GoodDto;
+import com.qewby.network.dto.GoodGroupDto;
 import com.qewby.network.service.GoodService;
 import com.qewby.network.service.implementation.DefaultGoodService;
+
+import java.sql.SQLException;
 
 @RestController
 public class GoodController {
@@ -20,13 +23,13 @@ public class GoodController {
     }
 
     @RequestMapping(path = "/api/good", method = RequestMethod.PUT)
-    public GoodDto createNewGood(@RequestBody GoodDto goodDto) {
-        return goodService.createNewGood(goodDto);
+    public void createNewGood(@RequestBody GoodGroupDto goodDto) throws SQLException {
+        goodService.createNewGood(goodDto);
     }
 
     @RequestMapping(path = "/api/good/{id}", method = RequestMethod.POST)
     public void updateGoodById(@PathParameter("id") String id,
-            @RequestBody GoodDto goodDto) {
+            @RequestBody GoodGroupDto goodDto) {
         goodService.updateGoodById(id, goodDto);
     }
 
