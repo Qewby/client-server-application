@@ -15,7 +15,7 @@ export interface Credentials {
 interface AuthContextType {
   user: Token | null;
   signin: (credentials: Credentials, redirect: VoidFunction) => void;
-  signout: (redirect: VoidFunction) => void;
+  logout: (redirect: VoidFunction) => void;
   serverError: string;
   setServerError: Function;
 }
@@ -65,7 +65,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       );
   };
 
-  const signout = (redirect: VoidFunction) => {
+  const logout = (redirect: VoidFunction) => {
     setUser(null);
     sessionStorage.clear();
     redirect();
@@ -74,7 +74,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const value: AuthContextType = {
     user,
     signin,
-    signout,
+    logout: logout,
     serverError: serverError,
     setServerError: setServerError,
   };

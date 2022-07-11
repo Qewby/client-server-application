@@ -14,7 +14,7 @@ function LoginForm() {
 
   const navigate = useNavigate();
   const state = useLocation().state as LocationState;
-  const pathname = state?.from?.pathname ?? "/";
+  const pathname = state?.from?.pathname ?? "/goods";
 
   const { signin, serverError } = React.useContext(AuthContext);
 

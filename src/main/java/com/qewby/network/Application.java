@@ -22,7 +22,7 @@ import com.qewby.network.filter.Filter404;
 import com.qewby.network.filter.AuthJwtFilter;
 import com.qewby.network.filter.EmptyHandler;
 import com.qewby.network.filter.RequestMappingFilter;
-import com.qewby.network.filter.SetJsonFilter;
+import com.qewby.network.filter.SetDefaultHeadersFilter;
 import com.qewby.network.service.UserService;
 import com.qewby.network.service.implementation.DefaultUserService;
 
@@ -71,7 +71,7 @@ public class Application {
         List<String> allowWithoutAuth = Arrays.asList("/login");
 
         HttpContext rootContext = server.createContext("/", new EmptyHandler());
-        rootContext.getFilters().add(new SetJsonFilter());
+        rootContext.getFilters().add(new SetDefaultHeadersFilter());
         rootContext.getFilters().add(new AuthJwtFilter());
         rootContext.getFilters().add(new Filter404());
         contextMap.put("/", rootContext);
@@ -88,7 +88,7 @@ public class Application {
                     if (!contextMap.containsKey(path)) {
                         HttpContext context = server.createContext(path,
                                 new EmptyHandler());
-                        context.getFilters().add(new SetJsonFilter());
+                        context.getFilters().add(new SetDefaultHeadersFilter());
                         if (!allowWithoutAuth.contains(path)) {
                             context.getFilters().add(new AuthJwtFilter());
                         }
@@ -104,6 +104,7 @@ public class Application {
     }
 
     public void start() {
+        System.out.println("Start listening at port " + server.getAddress().getPort());
         server.start();
     }
 

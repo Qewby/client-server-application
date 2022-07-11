@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./login/Login";
 import RouteProtector from "./login/components/RouteProtector";
@@ -20,9 +20,10 @@ function App() {
               </RouteProtector>
             }
           >
-            <Route path="dashboard" element={<h1>Test</h1>} />
-            <Route path="*" element={<h1>404 Not found</h1>} />
+            <Route path="groups" element={<h1>Groups</h1>} />
+            <Route path="goods" element={<h1>Goods</h1>} />
           </Route>
+          <Route path="*" element={<Navigate to="/goods" replace/>} />
         </Routes>
       </AuthProvider>
     </>
