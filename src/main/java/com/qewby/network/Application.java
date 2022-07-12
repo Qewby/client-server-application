@@ -1,10 +1,11 @@
 package com.qewby.network;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
+import java.security.*;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +29,13 @@ import com.qewby.network.filter.SetDefaultHeadersFilter;
 import com.qewby.network.service.UserService;
 import com.qewby.network.service.implementation.DefaultUserService;
 
+import javax.net.ssl.*;
+
 public class Application {
 
-    private HttpServer server;
-
-    public Application() throws IOException {
-        server = HttpServer.create();
+    private final HttpsServer server;
+    public Application (final int port) throws IOException {
+        server = HttpsServer.create();
     }
 
     public void initializeDatabase(String name) throws SQLException {
@@ -64,13 +66,46 @@ public class Application {
         UserService userService = new DefaultUserService();
         try {
             userService.createNewUser(new UserDto("root", "root"));
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
-    public void createContextes() {
+
+    public void serverInit(){
+        try {
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            char[] password = "password".toCharArray();
+            KeyStore keyStore = KeyStore.getInstance("JKS");
+            FileInputStream keystream = new FileInputStream("src/main/testkey.jks");
+            keyStore.load(keystream, password);
+            KeyManagerFactory keyManager = KeyManagerFactory.getInstance("SunX509");
+            keyManager.init(keyStore, password);
+            TrustManagerFactory trustManager = TrustManagerFactory.getInstance("SunX509");
+            trustManager.init(keyStore);
+            sslContext.init(keyManager.getKeyManagers(), trustManager.getTrustManagers(), null);
+            server.setHttpsConfigurator(new HttpsConfigurator(sslContext) {
+                public void configure(HttpsParameters params) {
+                    try {
+                        SSLContext sslContext = getSSLContext();
+                        SSLEngine sslEngine = sslContext.createSSLEngine();
+                        params.setNeedClientAuth(false);
+                        params.setCipherSuites(sslEngine.getEnabledCipherSuites());
+                        params.setProtocols(sslEngine.getEnabledProtocols());
+                        SSLParameters sslParameters = sslContext.getSupportedSSLParameters();
+                        params.setSSLParameters(sslParameters);
+                    } catch (Exception e) {
+                        System.out.println("Failed to create the HTTPS port");
+                    }
+                }
+            });
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void createContexts() {
         Map<String, HttpContext> contextMap = new HashMap<>();
-        List<String> allowWithoutAuth = Arrays.asList("/login");
+        List<String> allowWithoutAuth = List.of("/login");
 
         HttpContext rootContext = server.createContext("/", new EmptyHandler());
         rootContext.getFilters().add(new SetDefaultHeadersFilter());
@@ -106,7 +141,7 @@ public class Application {
     }
 
     public void start(final int port) throws IOException {
-        server.bind(new InetSocketAddress(8080), 0);
+        server.bind(new InetSocketAddress(port), 0);
         System.out.println("Start listening at port " + server.getAddress().getPort());
         server.setExecutor(Executors.newFixedThreadPool(8));
         server.start();
@@ -115,7 +150,8 @@ public class Application {
     public static void main(String[] args) throws SQLException, IOException {
         Application application = new Application();
         application.initializeDatabase("data.db");
-        application.createContextes();
+        application.serverInit();
+        application.createContexts();
         application.start(8080);
     }
 }

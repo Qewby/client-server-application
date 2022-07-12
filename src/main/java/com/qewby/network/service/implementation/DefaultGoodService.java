@@ -16,7 +16,7 @@ import com.qewby.network.service.GoodService;
 public class DefaultGoodService implements GoodService {
 
     private GoodDao goodDao = new DefaultGoodDao();
-
+    private GoodConverter goodConverter = new GoodConverter();
     @Override
     public GoodDto getGoodById(final String stringId) {
         try {

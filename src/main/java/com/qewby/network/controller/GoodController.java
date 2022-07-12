@@ -12,6 +12,8 @@ import com.qewby.network.dto.RequestGoodDto;
 import com.qewby.network.service.GoodService;
 import com.qewby.network.service.implementation.DefaultGoodService;
 
+import java.sql.SQLException;
+
 @RestController
 public class GoodController {
 
