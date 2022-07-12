@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.reflections.Reflections;
 
@@ -106,6 +108,7 @@ public class Application {
     public void start(final int port) throws IOException {
         server.bind(new InetSocketAddress(8080), 0);
         System.out.println("Start listening at port " + server.getAddress().getPort());
+        server.setExecutor(Executors.newFixedThreadPool(8));
         server.start();
     }
 

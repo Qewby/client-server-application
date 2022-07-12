@@ -1,5 +1,6 @@
 package com.qewby.network.service.implementation;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,12 @@ public class DefaultGoodService implements GoodService {
                     || requestGoodDto.getPrice() == null) {
                 throw new ResponseErrorException(409, "Not all required fields");
             }
+            if (requestGoodDto.getPrice().compareTo(new BigDecimal(0)) <= 0) {
+                throw new ResponseErrorException(409, "Invalid price");
+            }
+            if (requestGoodDto.getNumber() < 0) {
+                throw new ResponseErrorException(409, "Invalid number");
+            }
             if (goodDao.getGoodByName(requestGoodDto.getName()).isPresent()) {
                 throw new ResponseErrorException(409, "Group with such name already exists");
             }
@@ -64,6 +71,12 @@ public class DefaultGoodService implements GoodService {
             if (requestGoodDto.getName() == null || requestGoodDto.getGroupId() == null
                     || requestGoodDto.getPrice() == null) {
                 throw new ResponseErrorException(409, "Not all required fields");
+            }
+            if (requestGoodDto.getPrice().compareTo(new BigDecimal(0)) <= 0) {
+                throw new ResponseErrorException(409, "Invalid price");
+            }
+            if (requestGoodDto.getNumber() < 0) {
+                throw new ResponseErrorException(409, "Invalid number");
             }
             Optional<GoodDto> existed = goodDao.getGoodById(id);
             Optional<GoodDto> existedName = goodDao.getGoodByName(requestGoodDto.getName());

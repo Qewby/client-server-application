@@ -70,8 +70,7 @@ function Goods() {
       (res) => {
         setGroups(res.data);
       },
-      (err) => {
-      }
+      (err) => {}
     );
   }, []);
 
@@ -143,14 +142,19 @@ function Goods() {
     )),
   };
 
-  const handleRowUpdate = (
-    newData: Good,
-    oldData: any,
-    resolve: any
-  ): void => {
+  const handleRowUpdate = (newData: Good, oldData: any, resolve: any): void => {
     let errorList = [];
-    if (newData.name === "") {
+    if (!newData.name) {
       errorList.push("Try Again, You didn't enter the name field");
+    }
+    if (!newData.price) {
+      errorList.push("Try Again, You didn't enter the price field");
+    }
+    if (!newData.number) {
+      errorList.push("Try Again, You didn't enter the number field");
+    }
+    if (!newData.groupId) {
+      errorList.push("Try Again, You didn't enter the group field");
     }
     if (errorList.length < 1) {
       axios
@@ -158,7 +162,10 @@ function Goods() {
         .then((response) => {
           const updateUser = [...goods];
           const index = oldData.tableData.id;
-          updateUser[index] = newData;
+          updateUser[index] = {
+            ...newData,
+            totalPrice: (newData.number * newData.price).toFixed(2),
+          };
           setGoods([...updateUser]);
           resolve();
           setIserror(false);
@@ -198,15 +205,28 @@ function Goods() {
   const handleRowAdd = (newData: Good, resolve: any): void => {
     //validating the data inputs
     let errorList = [];
-    if (newData.name === "") {
+    if (!newData.name) {
       errorList.push("Try Again, You didn't enter the name field");
+    }
+    if (!newData.price) {
+      errorList.push("Try Again, You didn't enter the price field");
+    }
+    if (!newData.number) {
+      errorList.push("Try Again, You didn't enter the number field");
+    }
+    if (!newData.groupId) {
+      errorList.push("Try Again, You didn't enter the group field");
     }
     if (errorList.length < 1) {
       axios
         .put(`/api/good`, newData)
         .then((response) => {
           let newGroup = [...goods];
-          newGroup.push(response.data);
+          newGroup.push({
+            ...newData,
+            id: response.data.id,
+            totalPrice: (newData.number * newData.price).toFixed(2),
+          });
           setGoods(newGroup);
           resolve();
           setErrorMessages([]);
@@ -262,6 +282,7 @@ function Goods() {
                         Total price: ${sum}
                       </Typography>
                     </TableCell>
+                    <TableCell colSpan={1}></TableCell>
                   </TableRow>
                   <MTableBody {...props} />
                 </>
