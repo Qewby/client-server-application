@@ -1,6 +1,7 @@
 package com.qewby.network.service.implementation;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 import com.qewby.network.dao.GoodDao;
@@ -51,6 +52,17 @@ public class DefaultGoodService implements GoodService {
             }
         } catch (NumberFormatException e) {
             throw new ResponseErrorException(400, "ID is not an integer number");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseErrorException(500);
+        }
+    }
+
+    @Override
+    public List<GoodDto> getAllGoods() {
+        try {
+            List<GoodDto> result = goodDao.getAllGoods();
+            return result;
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ResponseErrorException(500);

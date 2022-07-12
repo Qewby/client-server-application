@@ -1,5 +1,7 @@
 package com.qewby.network.controller;
 
+import java.util.List;
+
 import com.qewby.network.annotation.PathParameter;
 import com.qewby.network.annotation.RequestBody;
 import com.qewby.network.annotation.RequestMapping;
@@ -13,6 +15,11 @@ import com.qewby.network.service.implementation.DefaultGoodService;
 public class GoodController {
 
     private GoodService goodService = new DefaultGoodService();
+
+    @RequestMapping(path = "/api/goods", method = RequestMethod.GET)
+    public List<GoodDto> getGoodById() {
+        return goodService.getAllGoods();
+    }
 
     @RequestMapping(path = "/api/good/{id}", method = RequestMethod.GET)
     public GoodDto getGoodById(@PathParameter("id") String id) {
