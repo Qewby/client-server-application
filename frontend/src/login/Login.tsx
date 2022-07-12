@@ -9,7 +9,7 @@ import "./Login.css";
 function Login() {
   const { user } = React.useContext(AuthContext);
   if (user) {
-    return <Navigate to={"/dashboard"} replace />;
+    return <Navigate to={"/goods"} replace />;
   }
 
   return (
