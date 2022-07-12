@@ -1,5 +1,6 @@
 package com.qewby.network.service.implementation;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +16,7 @@ import com.qewby.network.service.GoodService;
 public class DefaultGoodService implements GoodService {
 
     private GoodDao goodDao = new DefaultGoodDao();
-
+    private GoodConverter goodConverter = new GoodConverter();
     @Override
     public GoodDto getGoodById(final String stringId) {
         try {

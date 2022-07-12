@@ -15,7 +15,7 @@ public interface GoodDao {
 
     Optional<GoodDto> getGoodByName(final String name) throws SQLException;
 
-    int insertNewGood(final GoodDto goodDto) throws SQLException;
+    void insertNewGood(final GoodDto goodDto) throws SQLException;
 
     int updateGoodInfoById(final GoodDto goodDto) throws SQLException;
 

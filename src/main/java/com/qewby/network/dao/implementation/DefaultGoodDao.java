@@ -79,7 +79,7 @@ public class DefaultGoodDao implements GoodDao {
     }
 
     @Override
-    public int insertNewGood(final GoodDto goodDto) throws SQLException {
+    public void insertNewGood(final GoodDto goodDto) throws SQLException {
         List<Object> parameterList = new LinkedList<>();
         parameterList.add(goodDto.getName());
         parameterList.add(goodDto.getGroup().getId());
@@ -87,7 +87,7 @@ public class DefaultGoodDao implements GoodDao {
         parameterList.add(goodDto.getManufacturer());
         parameterList.add(goodDto.getNumber());
         parameterList.add(goodDto.getPrice());
-        return executor.update(INSERT_NEW_GOOD, parameterList);
+        executor.update(INSERT_NEW_GOOD, parameterList);
     }
 
     @Override
