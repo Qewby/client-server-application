@@ -1,13 +1,16 @@
 package com.qewby.network.service;
 
 import com.qewby.network.dto.GoodDto;
+import com.qewby.network.dto.GoodGroupDto;
+
+import java.sql.SQLException;
 
 public interface GoodService {
     GoodDto getGoodById(final String id);
 
-    GoodDto createNewGood(final GoodDto goodDto);
+    void createNewGood(final GoodGroupDto goodDto) throws SQLException;
 
-    public void updateGoodById(final String id, final GoodDto goodDto);
+    void updateGoodById(final String id, final GoodGroupDto goodDto);
 
-    public void deleteGoodById(String id);
+    void deleteGoodById(String id);
 }

@@ -4,7 +4,9 @@ import java.util.List;
 
 import com.qewby.network.dto.GroupDto;
 
-public interface GroupService {
+
+public interface GroupService
+{
     List<GroupDto> getAllGroups();
 
     GroupDto addGroup(GroupDto groupDto);
