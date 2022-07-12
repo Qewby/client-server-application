@@ -48,7 +48,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signin = ({ login, password }: Credentials, redirect: VoidFunction) => {
     axios
-      .post(process.env.REACT_APP_API_URL + "/login", { login, password })
+      .post("/login", { login, password })
       .then(
         (res) => {
           sessionStorage.setItem("jwt_token", res.data.token);

@@ -28,7 +28,7 @@ public class GoodDaoTest {
 
     @Before
     public void createTestDatabase() throws SQLException, IOException {
-        Application application = new Application(8080);
+        Application application = new Application();
         application.initializeDatabase(testDatabaseName);
 
         GroupDto groupDto = new GroupDto();

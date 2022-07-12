@@ -98,7 +98,7 @@ function DashboardLayout() {
 
   return (
     <>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex"}}>
         <CssBaseline />
         <AppBar
           position="fixed"
@@ -158,7 +158,7 @@ function DashboardLayout() {
             {content}
           </Drawer>
         </Box>
-        <Box>
+        <Box style={{width: "100%"}}>
           <Toolbar />
           <Outlet />
         </Box>

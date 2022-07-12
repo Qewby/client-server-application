@@ -6,8 +6,11 @@ import RouteProtector from "./login/components/RouteProtector";
 import AuthProvider from "./login/components/AuthProvider";
 import DashboardLayout from "./common/components/DashboardLayout";
 import Groups from "./common/components/Groups";
+import axios from "axios";
 
 function App() {
+  axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+
   return (
     <>
       <AuthProvider>

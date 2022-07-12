@@ -30,8 +30,8 @@ public class Application {
 
     private HttpServer server;
 
-    public Application(final int port) throws IOException {
-        server = HttpServer.create(new InetSocketAddress(8080), 0);
+    public Application() throws IOException {
+        server = HttpServer.create();
     }
 
     public void initializeDatabase(String name) throws SQLException {
@@ -103,15 +103,16 @@ public class Application {
         }
     }
 
-    public void start() {
+    public void start(final int port) throws IOException {
+        server.bind(new InetSocketAddress(8080), 0);
         System.out.println("Start listening at port " + server.getAddress().getPort());
         server.start();
     }
 
     public static void main(String[] args) throws SQLException, IOException {
-        Application application = new Application(8080);
+        Application application = new Application();
         application.initializeDatabase("data.db");
         application.createContextes();
-        application.start();
+        application.start(8080);
     }
 }
