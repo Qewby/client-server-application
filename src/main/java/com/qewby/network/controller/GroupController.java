@@ -2,6 +2,7 @@ package com.qewby.network.controller;
 
 import java.util.List;
 
+import com.qewby.network.annotation.PathParameter;
 import com.qewby.network.annotation.RequestBody;
 import com.qewby.network.annotation.RequestMapping;
 import com.qewby.network.annotation.RequestMethod;
@@ -25,28 +26,16 @@ public class GroupController {
 
     @RequestMapping(path = "/api/group", method = RequestMethod.PUT)
     public GroupDto addGroup(@RequestBody GroupDto groupDto) {
-        if (groupService.addGroup(groupDto) == 1)
-        {
-            return groupDto;
-        }
-        return null;
+        return groupService.addGroup(groupDto);
     }
 
-    @RequestMapping(path = "/api/group", method = RequestMethod.POST)
-    public GroupDto updateGroup(@RequestBody GroupDto groupDto) {
-        if (groupService.updateGroup(groupDto) == 1)
-        {
-            return groupDto;
-        }
-        return null;
+    @RequestMapping(path = "/api/group/{id}", method = RequestMethod.POST)
+    public void updateGroup(@RequestBody GroupDto groupDto, @PathParameter("id") String groupId) {
+        groupService.updateGroup(Integer.valueOf(groupId), groupDto);
     }
 
-    @RequestMapping(path = "/api/group", method = RequestMethod.DELETE)
-    public Integer deleteGroup(@RequestParameter("id") Integer groupId) {
-        if (groupService.deleteGroupById(groupId) == 1)
-        {
-            return groupId;
-        }
-        return null;
+    @RequestMapping(path = "/api/group/{id}", method = RequestMethod.DELETE)
+    public void deleteGroup(@PathParameter("id") String groupId) {
+        groupService.deleteGroupById(Integer.valueOf(groupId));
     }
 }

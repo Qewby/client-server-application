@@ -23,7 +23,7 @@ import com.qewby.network.filter.Filter404;
 import com.qewby.network.filter.AuthJwtFilter;
 import com.qewby.network.filter.EmptyHandler;
 import com.qewby.network.filter.RequestMappingFilter;
-import com.qewby.network.filter.SetJsonFilter;
+import com.qewby.network.filter.SetDefaultHeadersFilter;
 import com.qewby.network.service.UserService;
 import com.qewby.network.service.implementation.DefaultUserService;
 
@@ -33,7 +33,7 @@ public class Application {
 
     private final HttpsServer server;
     public Application (final int port) throws IOException {
-        server = HttpsServer.create(new InetSocketAddress(port), 0);
+        server = HttpsServer.create();
     }
 
     public void initializeDatabase(String name) throws SQLException {
@@ -106,7 +106,7 @@ public class Application {
         List<String> allowWithoutAuth = List.of("/login");
 
         HttpContext rootContext = server.createContext("/", new EmptyHandler());
-        rootContext.getFilters().add(new SetJsonFilter());
+        rootContext.getFilters().add(new SetDefaultHeadersFilter());
         rootContext.getFilters().add(new AuthJwtFilter());
         rootContext.getFilters().add(new Filter404());
         contextMap.put("/", rootContext);
@@ -123,7 +123,7 @@ public class Application {
                     if (!contextMap.containsKey(path)) {
                         HttpContext context = server.createContext(path,
                                 new EmptyHandler());
-                        context.getFilters().add(new SetJsonFilter());
+                        context.getFilters().add(new SetDefaultHeadersFilter());
                         if (!allowWithoutAuth.contains(path)) {
                             context.getFilters().add(new AuthJwtFilter());
                         }
@@ -138,15 +138,17 @@ public class Application {
         }
     }
 
-    public void start() {
+    public void start(final int port) throws IOException {
+        server.bind(new InetSocketAddress(port), 0);
+        System.out.println("Start listening at port " + server.getAddress().getPort());
         server.start();
     }
 
     public static void main(String[] args) throws SQLException, IOException {
-        Application application = new Application(9000);
+        Application application = new Application();
         application.initializeDatabase("data.db");
         application.serverInit();
         application.createContexts();
-        application.start();
+        application.start(8080);
     }
 }

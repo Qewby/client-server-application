@@ -9,13 +9,9 @@ public interface GroupService
 {
     List<GroupDto> getAllGroups();
 
-    int addGroup(GroupDto groupDto);
+    GroupDto addGroup(GroupDto groupDto);
 
-    int updateGroup(GroupDto groupDto);
+	void updateGroup(Integer id, GroupDto groupDto);
 
-    int deleteGroupById(Integer id);
-
-    GroupDto getGroupById(Integer id);
-
-    GroupDto getGroupByName(String name);
+	void deleteGroupById(Integer id);
 }
