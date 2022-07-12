@@ -1,16 +1,23 @@
 package com.qewby.network;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
+import java.security.KeyStore;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.reflections.Reflections;
 
@@ -30,10 +37,10 @@ import com.qewby.network.service.implementation.DefaultUserService;
 
 public class Application {
 
-    private HttpServer server;
+    private HttpsServer server;
 
     public Application() throws IOException {
-        server = HttpServer.create();
+        server = HttpsServer.create();
     }
 
     public void initializeDatabase(String name) throws SQLException {
@@ -105,6 +112,38 @@ public class Application {
         }
     }
 
+    public void serverInit(){
+        try {
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            char[] password = "password".toCharArray();
+            KeyStore keyStore = KeyStore.getInstance("JKS");
+            FileInputStream keystream = new FileInputStream("./testkey.jks");
+            keyStore.load(keystream, password);
+            KeyManagerFactory keyManager = KeyManagerFactory.getInstance("SunX509");
+            keyManager.init(keyStore, password);
+            TrustManagerFactory trustManager = TrustManagerFactory.getInstance("SunX509");
+            trustManager.init(keyStore);
+            sslContext.init(keyManager.getKeyManagers(), trustManager.getTrustManagers(), null);
+            server.setHttpsConfigurator(new HttpsConfigurator(sslContext) {
+                public void configure(HttpsParameters params) {
+                    try {
+                        SSLContext sslContext = getSSLContext();
+                        SSLEngine sslEngine = sslContext.createSSLEngine();
+                        params.setNeedClientAuth(false);
+                        params.setCipherSuites(sslEngine.getEnabledCipherSuites());
+                        params.setProtocols(sslEngine.getEnabledProtocols());
+                        SSLParameters sslParameters = sslContext.getSupportedSSLParameters();
+                        params.setSSLParameters(sslParameters);
+                    } catch (Exception e) {
+                        System.out.println("Failed to create the HTTPS port");
+                    }
+                }
+            });
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public void start(final int port) throws IOException {
         server.bind(new InetSocketAddress(8080), 0);
         System.out.println("Start listening at port " + server.getAddress().getPort());
@@ -115,6 +154,7 @@ public class Application {
     public static void main(String[] args) throws SQLException, IOException {
         Application application = new Application();
         application.initializeDatabase("data.db");
+        application.serverInit();
         application.createContextes();
         application.start(8080);
     }
