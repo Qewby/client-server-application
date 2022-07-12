@@ -19,11 +19,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import {
   Alert,
   AlertTitle,
-  Divider,
-  Grid,
   TableCell,
-  TableFooter,
-  TablePagination,
   TableRow,
   Typography,
 } from "@mui/material";
@@ -32,7 +28,7 @@ function Goods() {
   interface Good {
     id: number;
     name: string;
-    group: string;
+    groupId: string;
     description: string | null;
     manufacturer: string | null;
     number: number;
@@ -57,7 +53,7 @@ function Goods() {
           let tableRowValue: Good = {
             id: value.id,
             name: value.name,
-            group: value.group.id.toString(),
+            groupId: value.group.id.toString(),
             description: value.description,
             manufacturer: value.manufacturer,
             number: value.number,
@@ -87,7 +83,7 @@ function Goods() {
   const columns: Column<Good>[] = [
     { field: "id", title: "ID", hidden: true },
     { field: "name", title: "Name", filtering: false },
-    { field: "group", title: "Group", filtering: true, lookup: groupsLookup },
+    { field: "groupId", title: "Group", filtering: true, lookup: groupsLookup },
     { field: "description", title: "Description", filtering: false },
     { field: "manufacturer", title: "Manufacturer", filtering: false },
     {
@@ -147,7 +143,7 @@ function Goods() {
     )),
   };
 
-  /* const handleRowUpdate = (
+  const handleRowUpdate = (
     newData: Good,
     oldData: any,
     resolve: any
@@ -158,7 +154,7 @@ function Goods() {
     }
     if (errorList.length < 1) {
       axios
-        .post(`/api/group/${oldData.id}`, newData)
+        .post(`/api/good/${oldData.id}`, newData)
         .then((response) => {
           const updateUser = [...goods];
           const index = oldData.tableData.id;
@@ -183,7 +179,7 @@ function Goods() {
   //function for deleting a row
   const handleRowDelete = (oldData: any, resolve: any): void => {
     axios
-      .delete(`/api/group/${oldData.id}`)
+      .delete(`/api/good/${oldData.id}`)
       .then((response) => {
         const dataDelete = [...goods];
         const index = oldData.tableData.id;
@@ -207,7 +203,7 @@ function Goods() {
     }
     if (errorList.length < 1) {
       axios
-        .put(`/api/group`, newData)
+        .put(`/api/good`, newData)
         .then((response) => {
           let newGroup = [...goods];
           newGroup.push(response.data);
@@ -226,7 +222,7 @@ function Goods() {
       setIserror(true);
       resolve();
     }
-  }; */
+  };
 
   return (
     <>
@@ -275,20 +271,15 @@ function Goods() {
           editable={{
             onRowUpdate: (newData, oldData) =>
               new Promise<void>((resolve) => {
-                resolve();
-                console.log(newData);
-                console.log(oldData);
-                //handleRowUpdate(newData, oldData, resolve);
+                handleRowUpdate(newData, oldData, resolve);
               }),
             onRowAdd: (newData) =>
               new Promise<void>((resolve) => {
-                resolve();
-                //handleRowAdd(newData, resolve);
+                handleRowAdd(newData, resolve);
               }),
             onRowDelete: (oldData) =>
               new Promise<void>((resolve) => {
-                resolve();
-                //handleRowDelete(oldData, resolve);
+                handleRowDelete(oldData, resolve);
               }),
           }}
         />

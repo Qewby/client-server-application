@@ -8,6 +8,7 @@ import com.qewby.network.annotation.RequestMapping;
 import com.qewby.network.annotation.RequestMethod;
 import com.qewby.network.annotation.RestController;
 import com.qewby.network.dto.GoodDto;
+import com.qewby.network.dto.RequestGoodDto;
 import com.qewby.network.service.GoodService;
 import com.qewby.network.service.implementation.DefaultGoodService;
 
@@ -27,14 +28,14 @@ public class GoodController {
     }
 
     @RequestMapping(path = "/api/good", method = RequestMethod.PUT)
-    public GoodDto createNewGood(@RequestBody GoodDto goodDto) {
-        return goodService.createNewGood(goodDto);
+    public GoodDto createNewGood(@RequestBody RequestGoodDto requestGoodDto) {
+        return goodService.createNewGood(requestGoodDto);
     }
 
     @RequestMapping(path = "/api/good/{id}", method = RequestMethod.POST)
     public void updateGoodById(@PathParameter("id") String id,
-            @RequestBody GoodDto goodDto) {
-        goodService.updateGoodById(id, goodDto);
+            @RequestBody RequestGoodDto requestGoodDto) {
+        goodService.updateGoodById(id, requestGoodDto);
     }
 
     @RequestMapping(path = "/api/good/{id}", method = RequestMethod.DELETE)

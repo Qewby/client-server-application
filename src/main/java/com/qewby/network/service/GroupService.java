@@ -9,7 +9,7 @@ public interface GroupService {
 
     GroupDto addGroup(GroupDto groupDto);
 
-	void updateGroup(Integer id, GroupDto groupDto);
+	void updateGroup(final String id, GroupDto groupDto);
 
-	void deleteGroupById(Integer id);
+	void deleteGroupById(final String id);
 }
