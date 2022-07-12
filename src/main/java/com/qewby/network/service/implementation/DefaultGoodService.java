@@ -2,14 +2,14 @@ package com.qewby.network.service.implementation;
 
 import java.lang.reflect.Field;
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
-import com.qewby.network.converters.GoodConverter;
+import com.qewby.network.converter.RequestGoodDtoConverter;
 import com.qewby.network.dao.GoodDao;
 import com.qewby.network.dao.implementation.DefaultGoodDao;
 import com.qewby.network.dto.GoodDto;
-import com.qewby.network.dto.GoodGroupDto;
+import com.qewby.network.dto.RequestGoodDto;
 import com.qewby.network.exception.ResponseErrorException;
 import com.qewby.network.service.GoodService;
 
@@ -36,41 +36,55 @@ public class DefaultGoodService implements GoodService {
     }
 
     @Override
-    public void createNewGood(GoodGroupDto goodDto) throws SQLException {
-        GoodDto created = goodConverter.convert(goodDto);
-        goodDao.insertNewGood(created);
+    public GoodDto createNewGood(final RequestGoodDto requestGoodDto) {
+        try {
+            if (requestGoodDto.getName() == null || requestGoodDto.getGroupId() == null
+                    || requestGoodDto.getPrice() == null) {
+                throw new ResponseErrorException(409, "Not all required fields");
+            }
+            if (goodDao.getGoodByName(requestGoodDto.getName()).isPresent()) {
+                throw new ResponseErrorException(409, "Group with such name already exists");
+            }
+            int rowCount = goodDao.insertNewGood(RequestGoodDtoConverter.convert(requestGoodDto));
+            if (rowCount == 1) {
+                return goodDao.getGoodByName(requestGoodDto.getName()).orElseThrow();
+            } else {
+                throw new ResponseErrorException(500);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseErrorException(500);
+        }
     }
 
     @Override
-    public void updateGoodById(String stringId, GoodGroupDto goodDto) {
+    public void updateGoodById(final String stringId, final RequestGoodDto requestGoodDto) {
         try {
-            GoodDto updatedGood = goodConverter.convert(goodDto);
-            GoodDto originalGood = goodDao.getGoodById(Integer.parseInt(stringId)).get();
-            for (Field field : updatedGood.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                Object value = field.get(updatedGood);
-                String fieldName = field.getName();
-                if (value == null) {
-                    Field field1 = originalGood.getClass().getDeclaredField(fieldName);
-                    field1.setAccessible(true);
-                    Object value1 = field1.get(originalGood);
-                    field.set(updatedGood, value1);
-                }
-            }
+            final int id = Integer.valueOf(stringId);
 
-            int rowCount = goodDao.updateGoodInfoById(updatedGood);
-            if (rowCount != 1) {
-                throw new ResponseErrorException(404, "No good with such id");
+            if (requestGoodDto.getName() == null || requestGoodDto.getGroupId() == null
+                    || requestGoodDto.getPrice() == null) {
+                throw new ResponseErrorException(409, "Not all required fields");
+            }
+            Optional<GoodDto> existed = goodDao.getGoodById(id);
+            Optional<GoodDto> existedName = goodDao.getGoodByName(requestGoodDto.getName());
+            if (existed.isPresent()) {
+                if (existedName.isPresent() && !existed.equals(existedName)) {
+                    throw new ResponseErrorException(409, "Name is already in use");
+                }
+                requestGoodDto.setId(id);
+                GoodDto goodDto = RequestGoodDtoConverter.convert(requestGoodDto);
+                if (!goodDto.equals(existed.get())) {
+                    goodDao.updateGoodInfoById(goodDto);
+                }
+            } else {
+                throw new ResponseErrorException(404, "Group with such id is not found");
             }
         } catch (NumberFormatException e) {
             throw new ResponseErrorException(400, "ID is not an integer number");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ResponseErrorException(500);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -79,11 +93,22 @@ public class DefaultGoodService implements GoodService {
         try {
             final int id = Integer.valueOf(stringId);
             int rowCount = goodDao.deleteGoodById(id);
-            if (rowCount != 1) {
+            if (rowCount == 0) {
                 throw new ResponseErrorException(404, "No good with such id");
             }
         } catch (NumberFormatException e) {
             throw new ResponseErrorException(400, "ID is not an integer number");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ResponseErrorException(500);
+        }
+    }
+
+    @Override
+    public List<GoodDto> getAllGoods() {
+        try {
+            List<GoodDto> result = goodDao.getAllGoods();
+            return result;
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ResponseErrorException(500);

@@ -124,8 +124,9 @@ public class DefaultGroupService implements GroupService
     }
 
     @Override
-    public void updateGroup(Integer id, GroupDto groupDto) {
+    public void updateGroup(final String stringId, final GroupDto groupDto) {
         try {
+            final int id = Integer.valueOf(stringId);
             if (groupDto.getName() == null) {
                 throw new ResponseErrorException(409, "Group name is required");
             }
@@ -142,6 +143,8 @@ public class DefaultGroupService implements GroupService
             } else {
                 throw new ResponseErrorException(404, "Group with such id is not found");
             }
+        } catch (NumberFormatException e) {
+            throw new ResponseErrorException(400, "ID is not an integer number");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ResponseErrorException(500);
@@ -149,14 +152,15 @@ public class DefaultGroupService implements GroupService
     }
 
     @Override
-    public void deleteGroupById(Integer id) {
+    public void deleteGroupById(final String stringId) {
         try {
-            Optional<GroupDto> existed = groupDao.getGroupById(id);
-            if (existed.isPresent()) {
-                groupDao.deleteGroupById(id);
-            } else {
+            final int id = Integer.valueOf(stringId);
+            int rowCount = groupDao.deleteGroupById(id);
+            if (rowCount == 0) {
                 throw new ResponseErrorException(404, "Group with such id is not found");
             }
+        } catch (NumberFormatException e) {
+            throw new ResponseErrorException(400, "ID is not an integer number");
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ResponseErrorException(500);

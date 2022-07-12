@@ -1,16 +1,19 @@
 package com.qewby.network.service;
 
-import com.qewby.network.dto.GoodDto;
-import com.qewby.network.dto.GoodGroupDto;
+import java.util.List;
 
-import java.sql.SQLException;
+import com.qewby.network.dto.GoodDto;
+import com.qewby.network.dto.RequestGoodDto;
 
 public interface GoodService {
+
+    List<GoodDto> getAllGoods();
+
     GoodDto getGoodById(final String id);
 
-    void createNewGood(final GoodGroupDto goodDto) throws SQLException;
+    GoodDto createNewGood(final RequestGoodDto goodDto);
 
-    void updateGoodById(final String id, final GoodGroupDto goodDto);
+    public void updateGoodById(final String id, final RequestGoodDto goodDto);
 
-    void deleteGoodById(String id);
+    public void deleteGoodById(final String id);
 }
