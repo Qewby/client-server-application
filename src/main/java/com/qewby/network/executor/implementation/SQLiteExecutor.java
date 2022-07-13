@@ -13,6 +13,7 @@ import com.qewby.network.executor.SQLExecutor;
 
 public class SQLiteExecutor implements SQLExecutor {
     private static String databaseName = null;
+    private static Connection connection;
 
     static {
         try {
@@ -24,12 +25,21 @@ public class SQLiteExecutor implements SQLExecutor {
     }
 
     public static void setDatabaseName(final String name) {
-        databaseName = name;
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+            databaseName = name;
+            connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     private void checkDatabaseName() {
-        if (databaseName == null) {
-            System.out.println("No database name setted");
+        if (databaseName == null || connection == null) {
+            System.out.println("No database setted");
             System.exit(1);
         }
     }
@@ -37,8 +47,7 @@ public class SQLiteExecutor implements SQLExecutor {
     public <T> List<T> executeQuery(final String sql, final RowMapper<T> mapper)
             throws SQLException {
         checkDatabaseName();
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
-                PreparedStatement statement = connection.prepareStatement(sql);) {
+        try (PreparedStatement statement = connection.prepareStatement(sql);) {
             LinkedList<T> result = new LinkedList<>();
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
@@ -53,8 +62,7 @@ public class SQLiteExecutor implements SQLExecutor {
     public <T> List<T> executeQuery(String sql, List<Object> parameterList, RowMapper<T> mapper)
             throws SQLException {
         checkDatabaseName();
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
-                PreparedStatement statement = connection.prepareStatement(sql);) {
+        try (PreparedStatement statement = connection.prepareStatement(sql);) {
             for (int i = 1; i <= parameterList.size(); ++i) {
                 statement.setObject(i, parameterList.get(i - 1));
             }
@@ -71,8 +79,7 @@ public class SQLiteExecutor implements SQLExecutor {
     @Override
     public int update(String sql) throws SQLException {
         checkDatabaseName();
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
-                PreparedStatement statement = connection.prepareStatement(sql);) {
+        try (PreparedStatement statement = connection.prepareStatement(sql);) {
             return statement.executeUpdate();
         }
     }
@@ -80,8 +87,7 @@ public class SQLiteExecutor implements SQLExecutor {
     @Override
     public int update(String sql, List<Object> parameterList) throws SQLException {
         checkDatabaseName();
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
-                PreparedStatement statement = connection.prepareStatement(sql);) {
+        try (PreparedStatement statement = connection.prepareStatement(sql);) {
             for (int i = 1; i <= parameterList.size(); ++i) {
                 statement.setObject(i, parameterList.get(i - 1));
             }
@@ -92,8 +98,7 @@ public class SQLiteExecutor implements SQLExecutor {
     @Override
     public void query(String sql) throws SQLException {
         checkDatabaseName();
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
-                PreparedStatement statement = connection.prepareStatement(sql);) {
+        try (PreparedStatement statement = connection.prepareStatement(sql);) {
             statement.execute();
         }
     }
@@ -101,8 +106,7 @@ public class SQLiteExecutor implements SQLExecutor {
     @Override
     public void query(String sql, List<Object> parameterList) throws SQLException {
         checkDatabaseName();
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
-                PreparedStatement statement = connection.prepareStatement(sql);) {
+        try (PreparedStatement statement = connection.prepareStatement(sql);) {
             for (int i = 1; i <= parameterList.size(); ++i) {
                 statement.setObject(i, parameterList.get(i - 1));
             }

@@ -28,11 +28,11 @@ public class GroupController {
 
     @RequestMapping(path = "/api/group/{id}", method = RequestMethod.POST)
     public void updateGroup(@RequestBody GroupDto groupDto, @PathParameter("id") String groupId) {
-        groupService.updateGroup(Integer.valueOf(groupId), groupDto);
+        groupService.updateGroup(groupId, groupDto);
     }
 
     @RequestMapping(path = "/api/group/{id}", method = RequestMethod.DELETE)
     public void deleteGroup(@PathParameter("id") String groupId) {
-        groupService.deleteGroupById(Integer.valueOf(groupId));
+        groupService.deleteGroupById(groupId);
     }
 }

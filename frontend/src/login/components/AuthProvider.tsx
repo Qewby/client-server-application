@@ -27,6 +27,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     const token = sessionStorage.getItem("jwt_token");
     if (token) {
       const decoded: Token = jwtDecode(token);
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + token;
       return decoded;
     }
     return null;
@@ -47,22 +49,20 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   const signin = ({ login, password }: Credentials, redirect: VoidFunction) => {
-    axios
-      .post("/login", { login, password })
-      .then(
-        (res) => {
-          sessionStorage.setItem("jwt_token", res.data.token);
-          const decoded: Token = jwtDecode(res.data.token);
-          setUser(decoded);
-          setServerError("");
-          axios.defaults.headers.common["Authorization"] =
-            "Bearer " + res.data.token;
-          redirect();
-        },
-        (err) => {
-          setServerError(err.response.data.message);
-        }
-      );
+    axios.post("/login", { login, password }).then(
+      (res) => {
+        sessionStorage.setItem("jwt_token", res.data.token);
+        const decoded: Token = jwtDecode(res.data.token);
+        setUser(decoded);
+        setServerError("");
+        axios.defaults.headers.common["Authorization"] =
+          "Bearer " + res.data.token;
+        redirect();
+      },
+      (err) => {
+        setServerError(err.response.data.message);
+      }
+    );
   };
 
   const logout = (redirect: VoidFunction) => {
