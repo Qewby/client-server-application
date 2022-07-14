@@ -16,7 +16,7 @@ public interface GoodService {
 
     public void updateGoodById(final String id, final RequestGoodDto goodDto);
 
-    public void updateGoodNumberById(final String id, final RequestGoodDto goodDto);
+    public int updateGoodNumberById(final String id, final Integer number);
 
     public void deleteGoodById(final String id);
 }

@@ -101,29 +101,31 @@ public class DefaultGoodService implements GoodService {
     }
 
 	@Override
-	public void updateGoodNumberById(final String id, final RequestGoodDto requestGoodDto)
+	public int updateGoodNumberById(final String id, Integer number)
 	{
 		GoodDto oldGoodDto = getGoodById(id);
 		Integer oldNumber = oldGoodDto.getNumber();
 
+		RequestGoodDto requestGoodDto = new RequestGoodDto();
 		requestGoodDto.setName(oldGoodDto.getName());
 		requestGoodDto.setGroupId(oldGoodDto.getGroup().getId().toString());
 		requestGoodDto.setPrice(oldGoodDto.getPrice());
 
-		Integer newNumber;
-		if (requestGoodDto.getNumber() < oldNumber)
+		if (number < oldNumber)
 		{
-			newNumber = oldNumber - requestGoodDto.getNumber();
+			number = oldNumber - number;
 		}
 		else
 		{
-			newNumber = oldNumber + requestGoodDto.getNumber();
+			number = oldNumber + number;
 		}
-		if (newNumber >= 0)
+		if (number >= 0)
 		{
-			requestGoodDto.setNumber(newNumber);
+			requestGoodDto.setNumber(number);
 			updateGoodById(id , requestGoodDto);
+			return number;
 		}
+		throw new ResponseErrorException(409, "Invalid number");
 	}
 
 	@Override
