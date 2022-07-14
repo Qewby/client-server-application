@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import com.project.network.converter.GoodDTOConverter;
 import com.project.network.converter.RequestGoodDtoConverter;
 import com.project.network.dao.GoodDao;
 import com.project.network.dto.RequestGoodDto;
@@ -106,10 +107,7 @@ public class DefaultGoodService implements GoodService {
 		GoodDto oldGoodDto = getGoodById(id);
 		Integer oldNumber = oldGoodDto.getNumber();
 
-		RequestGoodDto requestGoodDto = new RequestGoodDto();
-		requestGoodDto.setName(oldGoodDto.getName());
-		requestGoodDto.setGroupId(oldGoodDto.getGroup().getId().toString());
-		requestGoodDto.setPrice(oldGoodDto.getPrice());
+		RequestGoodDto requestGoodDto = GoodDTOConverter.convert(oldGoodDto);
 
 		if (number < oldNumber)
 		{
