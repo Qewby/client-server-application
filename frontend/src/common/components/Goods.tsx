@@ -48,29 +48,29 @@ function Goods() {
 
   React.useEffect(() => {
     axios.get("/api/goods").then(
-      (res) => {
-        let resultGoods = res.data.map((value: any) => {
-          let tableRowValue: Good = {
-            id: value.id,
-            name: value.name,
-            groupId: value.group.id.toString(),
-            description: value.description,
-            manufacturer: value.manufacturer,
-            number: value.number,
-            price: value.price,
-            totalPrice: (value.number * value.price).toFixed(2),
-          };
-          return tableRowValue;
-        });
-        setGoods(resultGoods);
-      },
-      (err) => {}
+        (res) => {
+          let resultGoods = res.data.map((value: any) => {
+            let tableRowValue: Good = {
+              id: value.id,
+              name: value.name,
+              groupId: value.group.id.toString(),
+              description: value.description,
+              manufacturer: value.manufacturer,
+              number: value.number,
+              price: value.price,
+              totalPrice: (value.number * value.price).toFixed(2),
+            };
+            return tableRowValue;
+          });
+          setGoods(resultGoods);
+        },
+        (err) => {}
     );
     axios.get("/api/groups").then(
-      (res) => {
-        setGroups(res.data);
-      },
-      (err) => {}
+        (res) => {
+          setGroups(res.data);
+        },
+        (err) => {}
     );
   }, []);
 
@@ -111,34 +111,34 @@ function Goods() {
     Check: forwardRef((props, ref) => <CheckIcon {...props} ref={ref} />),
     Clear: forwardRef((props, ref) => <ClearIcon {...props} ref={ref} />),
     Delete: forwardRef((props, ref) => (
-      <DeleteOutlineIcon {...props} ref={ref} />
+        <DeleteOutlineIcon {...props} ref={ref} />
     )),
     DetailPanel: forwardRef((props, ref) => (
-      <ChevronRightIcon {...props} ref={ref} />
+        <ChevronRightIcon {...props} ref={ref} />
     )),
     Edit: forwardRef((props, ref) => <EditIcon {...props} ref={ref} />),
     NextPage: forwardRef((props, ref) => (
-      <ChevronRightIcon {...props} ref={ref} />
+        <ChevronRightIcon {...props} ref={ref} />
     )),
     ResetSearch: forwardRef((props, ref) => <ClearIcon {...props} ref={ref} />),
     SortArrow: forwardRef((props, ref) => (
-      <ArrowDownwardIcon {...props} ref={ref} />
+        <ArrowDownwardIcon {...props} ref={ref} />
     )),
     Export: forwardRef((props, ref) => <SaveAltIcon {...props} ref={ref} />),
     Filter: forwardRef((props, ref) => <FilterListIcon {...props} ref={ref} />),
     FirstPage: forwardRef((props, ref) => (
-      <FirstPageIcon {...props} ref={ref} />
+        <FirstPageIcon {...props} ref={ref} />
     )),
     PreviousPage: forwardRef((props, ref) => (
-      <ChevronLeftIcon {...props} ref={ref} />
+        <ChevronLeftIcon {...props} ref={ref} />
     )),
     Search: forwardRef((props, ref) => <SearchIcon {...props} ref={ref} />),
     LastPage: forwardRef((props, ref) => <LastPageIcon {...props} ref={ref} />),
     ThirdStateCheck: forwardRef((props, ref) => (
-      <RemoveIcon {...props} ref={ref} />
+        <RemoveIcon {...props} ref={ref} />
     )),
     ViewColumn: forwardRef((props, ref) => (
-      <ViewColumnIcon {...props} ref={ref} />
+        <ViewColumnIcon {...props} ref={ref} />
     )),
   };
 
@@ -158,24 +158,24 @@ function Goods() {
     }
     if (errorList.length < 1) {
       axios
-        .post(`/api/good/${oldData.id}`, newData)
-        .then((response) => {
-          const updateUser = [...goods];
-          const index = oldData.tableData.id;
-          updateUser[index] = {
-            ...newData,
-            totalPrice: (newData.number * newData.price).toFixed(2),
-          };
-          setGoods([...updateUser]);
-          resolve();
-          setIserror(false);
-          setErrorMessages([]);
-        })
-        .catch((error) => {
-          setErrorMessages(["Update failed! Server error"]);
-          setIserror(true);
-          resolve();
-        });
+          .post(`/api/good/${oldData.id}`, newData)
+          .then((response) => {
+            const updateUser = [...goods];
+            const index = oldData.tableData.id;
+            updateUser[index] = {
+              ...newData,
+              totalPrice: (newData.number * newData.price).toFixed(2),
+            };
+            setGoods([...updateUser]);
+            resolve();
+            setIserror(false);
+            setErrorMessages([]);
+          })
+          .catch((error) => {
+            setErrorMessages(["Update failed! Server error"]);
+            setIserror(true);
+            resolve();
+          });
     } else {
       setErrorMessages(errorList);
       setIserror(true);
@@ -186,19 +186,19 @@ function Goods() {
   //function for deleting a row
   const handleRowDelete = (oldData: any, resolve: any): void => {
     axios
-      .delete(`/api/good/${oldData.id}`)
-      .then((response) => {
-        const dataDelete = [...goods];
-        const index = oldData.tableData.id;
-        dataDelete.splice(index, 1);
-        setGoods([...dataDelete]);
-        resolve();
-      })
-      .catch((error) => {
-        setErrorMessages(["Delete failed! Server error"]);
-        setIserror(true);
-        resolve();
-      });
+        .delete(`/api/good/${oldData.id}`)
+        .then((response) => {
+          const dataDelete = [...goods];
+          const index = oldData.tableData.id;
+          dataDelete.splice(index, 1);
+          setGoods([...dataDelete]);
+          resolve();
+        })
+        .catch((error) => {
+          setErrorMessages(["Delete failed! Server error"]);
+          setIserror(true);
+          resolve();
+        });
   };
 
   //function for adding a new row to the table
@@ -219,24 +219,24 @@ function Goods() {
     }
     if (errorList.length < 1) {
       axios
-        .put(`/api/good`, newData)
-        .then((response) => {
-          let newGroup = [...goods];
-          newGroup.push({
-            ...newData,
-            id: response.data.id,
-            totalPrice: (newData.number * newData.price).toFixed(2),
+          .put(`/api/good`, newData)
+          .then((response) => {
+            let newGroup = [...goods];
+            newGroup.push({
+              ...newData,
+              id: response.data.id,
+              totalPrice: (newData.number * newData.price).toFixed(2),
+            });
+            setGoods(newGroup);
+            resolve();
+            setErrorMessages([]);
+            setIserror(false);
+          })
+          .catch((error) => {
+            setErrorMessages(["Cannot add data. Server error!"]);
+            setIserror(true);
+            resolve();
           });
-          setGoods(newGroup);
-          resolve();
-          setErrorMessages([]);
-          setIserror(false);
-        })
-        .catch((error) => {
-          setErrorMessages(["Cannot add data. Server error!"]);
-          setIserror(true);
-          resolve();
-        });
     } else {
       setErrorMessages(errorList);
       setIserror(true);
@@ -244,68 +244,123 @@ function Goods() {
     }
   };
 
+  let handleGoodCountChange = (good: any, number: number) => {
+    axios
+        .post(`/api/good/number/${good.id}`, null, {
+          params: {
+            number,
+          },
+        })
+        .then((response) => {
+          const updateGood = [...goods];
+          const index = good.tableData.id;
+          updateGood[index] = {
+            ...good,
+            number: response.data,
+            totalPrice: (good.number * good.price).toFixed(2),
+          };
+          setGoods([...updateGood]);
+          setIserror(false);
+          setErrorMessages([]);
+        })
+        .catch((error) => {
+          setErrorMessages(["Update failed! Server error"]);
+          setIserror(true);
+        });
+  };
+
+  let handleMinus = (event: any, rowData: any) => {
+    let number = parseInt(prompt("Enter number")!);
+    if (isNaN(number) || number <= 0 || number > rowData.number) {
+      alert("Invalid number");
+    } else {
+      handleGoodCountChange(rowData, number);
+    }
+  };
+
+  let handlePlus = (event: any, rowData: any) => {
+    let number = parseInt(prompt("Enter number")!);
+    if (isNaN(number) || number <= 0) {
+      alert("Invalid number");
+    } else {
+      handleGoodCountChange(rowData, -number);
+    }
+  };
+
   return (
-    <>
-      <div>
+      <>
         <div>
-          {iserror && (
-            <Alert severity="error">
-              <AlertTitle>ERROR</AlertTitle>
-              {errorMessages.map((msg, i) => {
-                return <div key={i}>{msg}</div>;
-              })}
-            </Alert>
-          )}
+          <div>
+            {iserror && (
+                <Alert severity="error">
+                  <AlertTitle>ERROR</AlertTitle>
+                  {errorMessages.map((msg, i) => {
+                    return <div key={i}>{msg}</div>;
+                  })}
+                </Alert>
+            )}
+          </div>
+          <MaterialTable
+              title={""}
+              columns={columns}
+              data={goods}
+              options={{
+                pageSize: 10,
+                thirdSortClick: false,
+                actionsColumnIndex: -1,
+                filtering: true,
+              }}
+              icons={tableIcons}
+              actions={[
+                {
+                  icon: () => <AddIcon />,
+                  tooltip: "Save User",
+                  onClick: handlePlus,
+                },
+                {
+                  icon: () => <RemoveIcon />,
+                  tooltip: "Save User",
+                  onClick: handleMinus,
+                },
+              ]}
+              components={{
+                Body: (props) => {
+                  let sum = 0;
+                  props.renderData.forEach((element: Good) => {
+                    sum += +element.totalPrice;
+                  });
+                  return (
+                      <>
+                        <TableRow>
+                          <TableCell colSpan={7} align="right">
+                            <Typography fontWeight={"bold"}>
+                              Total price: ${sum}
+                            </Typography>
+                          </TableCell>
+                          <TableCell colSpan={1}></TableCell>
+                        </TableRow>
+                        <MTableBody {...props} />
+                      </>
+                  );
+                },
+              }}
+              editable={{
+                onRowUpdate: (newData, oldData) =>
+                    new Promise<void>((resolve) => {
+                      handleRowUpdate(newData, oldData, resolve);
+                    }),
+                onRowAdd: (newData) =>
+                    new Promise<void>((resolve) => {
+                      handleRowAdd(newData, resolve);
+                    }),
+                onRowDelete: (oldData) =>
+                    new Promise<void>((resolve) => {
+                      handleRowDelete(oldData, resolve);
+                    }),
+              }}
+          />
         </div>
-        <MaterialTable
-          title={""}
-          columns={columns}
-          data={goods}
-          options={{
-            pageSize: 10,
-            thirdSortClick: false,
-            actionsColumnIndex: -1,
-            filtering: true,
-          }}
-          icons={tableIcons}
-          components={{
-            Body: (props) => {
-              let sum = 0;
-              props.renderData.forEach((element: Good) => {
-                sum += +element.totalPrice;
-              });
-              return (
-                <>
-                  <TableRow>
-                    <TableCell colSpan={7} align="right">
-                      <Typography fontWeight={"bold"}>
-                        Total price: ${sum}
-                      </Typography>
-                    </TableCell>
-                    <TableCell colSpan={1}></TableCell>
-                  </TableRow>
-                  <MTableBody {...props} />
-                </>
-              );
-            },
-          }}
-          editable={{
-            onRowUpdate: (newData, oldData) =>
-              new Promise<void>((resolve) => {
-                handleRowUpdate(newData, oldData, resolve);
-              }),
-            onRowAdd: (newData) =>
-              new Promise<void>((resolve) => {
-                handleRowAdd(newData, resolve);
-              }),
-            onRowDelete: (oldData) =>
-              new Promise<void>((resolve) => {
-                handleRowDelete(oldData, resolve);
-              }),
-          }}
-        />
-      </div>
-    </>
+      </>
   );
 }
 

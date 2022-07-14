@@ -83,7 +83,7 @@
             <configuration>
               <archive>
                 <manifest>
-                  <mainClass>com.qewby.network.Application</mainClass>
+                  <mainClass>com.project.network.Application</mainClass>
                 </manifest>
               </archive>
               <descriptorRefs>
