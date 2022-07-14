@@ -1,17 +1,17 @@
-package com.qewby.network.service.implementation;
+package com.project.network.service.implementation;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-import com.qewby.network.converter.RequestGoodDtoConverter;
-import com.qewby.network.dao.GoodDao;
-import com.qewby.network.dao.implementation.DefaultGoodDao;
-import com.qewby.network.dto.GoodDto;
-import com.qewby.network.dto.RequestGoodDto;
-import com.qewby.network.exception.ResponseErrorException;
-import com.qewby.network.service.GoodService;
+import com.project.network.converter.RequestGoodDtoConverter;
+import com.project.network.dao.GoodDao;
+import com.project.network.dto.RequestGoodDto;
+import com.project.network.exception.ResponseErrorException;
+import com.project.network.dao.implementation.DefaultGoodDao;
+import com.project.network.dto.GoodDto;
+import com.project.network.service.GoodService;
 
 public class DefaultGoodService implements GoodService {
 
@@ -100,7 +100,33 @@ public class DefaultGoodService implements GoodService {
         }
     }
 
-    @Override
+	@Override
+	public void updateGoodNumberById(final String id, final RequestGoodDto requestGoodDto)
+	{
+		GoodDto oldGoodDto = getGoodById(id);
+		Integer oldNumber = oldGoodDto.getNumber();
+
+		requestGoodDto.setName(oldGoodDto.getName());
+		requestGoodDto.setGroupId(oldGoodDto.getGroup().getId().toString());
+		requestGoodDto.setPrice(oldGoodDto.getPrice());
+
+		Integer newNumber;
+		if (requestGoodDto.getNumber() < oldNumber)
+		{
+			newNumber = oldNumber - requestGoodDto.getNumber();
+		}
+		else
+		{
+			newNumber = oldNumber + requestGoodDto.getNumber();
+		}
+		if (newNumber >= 0)
+		{
+			requestGoodDto.setNumber(newNumber);
+			updateGoodById(id , requestGoodDto);
+		}
+	}
+
+	@Override
     public void deleteGoodById(final String stringId) {
         try {
             final int id = Integer.valueOf(stringId);
