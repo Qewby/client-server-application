@@ -2,8 +2,9 @@ package com.project.network.service;
 
 import java.util.List;
 
-import com.project.network.dto.GoodDto;
 import com.project.network.dto.RequestGoodDto;
+import com.project.network.dto.GoodDto;
+
 
 public interface GoodService {
 
@@ -15,5 +16,8 @@ public interface GoodService {
 
     public void updateGoodById(final String id, final RequestGoodDto goodDto);
 
+    public int updateGoodNumberById(final String id, final Integer number);
+
     public void deleteGoodById(final String id);
 }
+

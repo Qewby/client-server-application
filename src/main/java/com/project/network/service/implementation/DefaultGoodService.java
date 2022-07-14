@@ -5,12 +5,13 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import com.project.network.converter.GoodDTOConverter;
 import com.project.network.converter.RequestGoodDtoConverter;
-import com.project.network.exception.ResponseErrorException;
 import com.project.network.dao.GoodDao;
+import com.project.network.dto.RequestGoodDto;
+import com.project.network.exception.ResponseErrorException;
 import com.project.network.dao.implementation.DefaultGoodDao;
 import com.project.network.dto.GoodDto;
-import com.project.network.dto.RequestGoodDto;
 import com.project.network.service.GoodService;
 
 public class DefaultGoodService implements GoodService {
@@ -98,6 +99,31 @@ public class DefaultGoodService implements GoodService {
             e.printStackTrace();
             throw new ResponseErrorException(500);
         }
+    }
+
+    @Override
+    public int updateGoodNumberById(final String id, Integer number)
+    {
+        GoodDto oldGoodDto = getGoodById(id);
+        Integer oldNumber = oldGoodDto.getNumber();
+
+        RequestGoodDto requestGoodDto = GoodDTOConverter.convert(oldGoodDto);
+
+        if (number < oldNumber)
+        {
+            number = oldNumber - number;
+        }
+        else
+        {
+            number = oldNumber + number;
+        }
+        if (number >= 0)
+        {
+            requestGoodDto.setNumber(number);
+            updateGoodById(id , requestGoodDto);
+            return number;
+        }
+        throw new ResponseErrorException(409, "Invalid number");
     }
 
     @Override

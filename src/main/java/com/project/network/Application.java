@@ -156,6 +156,6 @@ public class Application {
         application.initializeDatabase("data.db");
         application.serverInit();
         application.createContextes();
-        application.start(2286);
+        application.start(2287);
     }
 }
